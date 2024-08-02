@@ -1,0 +1,191 @@
+body {
+    font-family: 'Oswald', sans-serif;
+    background-color: #504150;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    
+}
+
+.container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.file-selector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.file-selector.hidden {
+    opacity: 0;
+    transform: scale(0);
+    visibility: hidden;
+}
+
+.left-panel {
+    width: 250px;
+    background: #333;
+    color: #fff;
+    padding: 20px 0;
+    height: 100vh;
+    position: relative;
+    z-index: 1;
+    transition: transform 0.5s ease-in-out;
+    transform: translateX(-100%);
+    display: flex;
+    flex-direction: column;
+}
+
+.left-panel.visible {
+    transform: translateX(0);
+}
+
+.competition-list {
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.main-panel {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: none;
+    transition: margin-left 0.5s ease-in-out;
+}
+
+.main-panel.visible {
+    display: block;
+}
+
+.level-container {
+    margin-bottom: 10px;
+}
+
+.level-header {
+    cursor: pointer;
+    padding: 10px;
+    background: #444;
+    border: 1px solid #555;
+    margin: 0;
+}
+
+.level-list {
+    list-style-type: none; /* Remove bullets from list items */
+    padding: 0;
+    margin: 0;
+}
+
+.level-list li {
+    padding: 5px 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #444;
+}
+
+.level-list li:hover {
+    background: #555;
+}
+
+h2 {
+    padding-left: 3px; 
+}
+
+.level-0 {
+    border-radius: 7px;
+    margin-right: 7px;
+    padding-left: 3px; 
+    background-color: #504f4f;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.level-1 {
+    padding-left: 5px !important; 
+    background-color: #4B0000; /* Dark Red */
+    font-size: 16px;
+    border-radius: 7px;
+    margin-right: 7px;
+}
+
+.level-2 {
+    padding-left: 7px !important; 
+    background-color: #004B00; /* Dark Green */
+    font-size: 14px;
+    border-radius: 7px;
+    margin-right: 7px;
+}
+
+.level-3 {
+    padding-left: 12px !important; 
+    background-color: #00004B; /* Dark Blue */
+    font-size: 14px;
+    border-radius: 7px;
+    margin-right: 7px;
+}
+
+.level-4 {
+    padding-left: 17px !important; 
+    background-color: #4B4B00; /* Dark Yellow */
+    font-size: 12px;
+    border-radius: 7px;
+    margin-right: 7px;
+}
+
+.level-5 {
+    padding-left: 23px !important; 
+    background-color: #4B004B; /* Dark Purple */
+    font-size: 12px;
+    border-radius: 7px;
+    margin-right: 7px;
+}
+
+ul, li {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Main panel divs for different levels */
+.level-0-content {
+    background-color: #504f4f;
+    color: #cac6c6
+}
+
+.level-1-content {
+    background-color: #4B0000; /* Dark Red */
+    color: #cac6c6
+}
+
+.level-2-content {
+    background-color: #004B00; /* Dark Green */
+    color: #cac6c6
+}
+
+.level-3-content {
+    background-color: #00004B; /* Dark Blue */
+    color: #cac6c6
+}
+
+.level-4-content {
+    background-color: #4B4B00; /* Dark Yellow */
+    color: #cac6c6
+}
+
+.level-5-content {
+    background-color: #4B004B; /* Dark Purple */
+    color: #cac6c6
+}
