@@ -1,6 +1,4 @@
 function organizeCompetitions(jsonContent) {
-    const hierarchy = [];
-    const allCompetitions = {};
 
     if (jsonContent['compobj.txt']) {
         const compobjLines = jsonContent['compobj.txt'].split('\r\n');
@@ -61,10 +59,14 @@ function displayHierarchy(jsonContent) {
     });
 }
 
-function appendCompetition(competition, parentElement, level) {
+function appendCompetition(competition, parentElement) {
     const listItem = document.createElement('li');
     listItem.textContent = `${competition.fullName} (${competition.id})`;
+    
+    // Use the level from the competition data
+    const level = competition.level;
     listItem.classList.add(`level-${level}`);
+    
     listItem.dataset.details = JSON.stringify(competition);
     listItem.addEventListener('click', function(e) {
         e.stopPropagation();
@@ -79,11 +81,12 @@ function appendCompetition(competition, parentElement, level) {
         childList.classList.add('level-list');
         childList.style.display = 'none';
         competition.children.forEach(child => {
-            appendCompetition(child, childList, level + 1);
+            appendCompetition(child, childList);
         });
         parentElement.appendChild(childList);
     }
 }
+
 
 function toggleExpandCollapse(element) {
     const nextSibling = element.nextElementSibling;
