@@ -398,7 +398,7 @@ let trophynames = {
     "970": "South America Cup",
     "980": "European Champ.",
     "981": "EC Qualifiers",
-    "990": "FIFA World Cup™",
+    "990": "FIFA World Cup",
     "991": "FIFA World Cup™ Qualifiers",
     "992": "FIFA World Cup™ Qualifiers",
     "993": "Asia Qualifier",

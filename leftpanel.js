@@ -1,38 +1,35 @@
-// Function to organize competitions into a hierarchy while preserving order
 function organizeCompetitions(jsonContent) {
     const hierarchy = [];
-    const levelStack = [];
+    const allCompetitions = {};
 
     if (jsonContent['compobj.txt']) {
         const compobjLines = jsonContent['compobj.txt'].split('\r\n');
         compobjLines.forEach(line => {
             if (line) {
                 const fields = line.split(',');
-                const level = parseInt(fields[1]);
                 const competition = {
                     id: fields[0],
                     shortName: replaceNames(fields[2].trim()),
                     fullName: replaceNames(fields[3].trim() || fields[2].trim() || "Unnamed Competition"),
-                    level: level,
+                    level: parseInt(fields[1]),
+                    parent: fields[4] !== '-1' ? fields[4] : null,
                     children: []
                 };
 
-                if (level === 0) {
+                allCompetitions[competition.id] = competition;
+
+                if (competition.parent === null) {
                     hierarchy.push(competition);
-                    levelStack[level] = competition;
                 } else {
-                    while (levelStack.length > level) {
-                        levelStack.pop();
-                    }
-                    const parent = levelStack[level - 1];
+                    const parent = allCompetitions[competition.parent];
                     if (parent) {
                         parent.children.push(competition);
-                        levelStack[level] = competition;
                     }
                 }
             }
         });
     }
+
     return hierarchy;
 }
 
