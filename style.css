@@ -8,6 +8,10 @@ body {
     
 }
 
+h3{
+    margin: 7px;
+}
+
 .container {
     display: flex;
     width: 100%;
@@ -37,10 +41,14 @@ body {
     visibility: hidden;
 }
 
+.hidden{
+    display: none;
+}
+
 .left-panel {
     width: 250px;
     background: #333;
-    color: #fff;
+    color: #ffffffcb;
     padding: 20px 0;
     height: 100vh;
     position: relative;
@@ -102,6 +110,8 @@ body {
 
 h2 {
     padding-left: 3px; 
+    margin-top: 12px;
+    margin-bottom: 7px;
 }
 
 .level-0 {
@@ -153,6 +163,14 @@ h2 {
     margin-right: 7px;
 }
 
+.level-6 {
+    padding-left: 27px !important; 
+    background-color: #5a544b; /* Dark Purple */
+    font-size: 11px;
+    border-radius: 7px;
+    margin-right: 7px;
+}
+
 ul, li {
     list-style: none;
     padding: 0;
@@ -188,4 +206,161 @@ ul, li {
 .level-5-content {
     background-color: #4B004B; /* Dark Purple */
     color: #cac6c6
+}
+
+.level-6-content {
+    background-color: #504a42; /* Dark Purple */
+    color: #cac6c6
+}
+
+.toggle-button{
+    background-color: #615d5d;
+    color: white;
+    border-radius: 7px;
+    cursor: pointer;
+    box-shadow: none; /* Remove shadow */
+}
+
+#mainheader{
+    color: white;
+}
+
+/* Styles for window-tables */
+.window-tables {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 12px;
+    font-size: 12px;
+}
+
+.window-tables th, .window-tables td {
+    background-color: #777171;
+    border: 1px solid #777171;
+    text-align: left; /* Ensure consistent text alignment */
+}
+
+.window-tables th {
+    background-color: #535050;
+    text-align: left;
+}
+
+.window-tables tr:nth-child(even) {
+    background-color: #535050;
+}
+
+.window-tables tr:hover {
+    background-color: #535050;
+}
+
+/* Additional styling for better readability */
+.window-tables td {
+    background-color: #535050;
+    color: #e2ddddea;
+    padding-left: 3px;
+    padding-right: 5px;
+}
+
+.tablevalue {
+    text-align: center;
+    width: 100%; /* Full width to fit the cell */
+}
+
+.tablevalue-input {
+    text-align: center;
+    width: 100%; /* Full width to fit the cell */
+    box-sizing: border-box; /* Ensure padding is included in width */
+}
+
+.window-tables tr td:first-child {
+    font-weight: bold;
+    background-color: #535050;
+}
+
+.standard-div h2 {
+    margin-top: 0;
+    font-size: 18px;
+    text-align:center;
+}
+
+.standard-div{
+    margin-bottom: 12px;
+    height: 50%;
+}
+
+.create-button {
+    margin-top: 12px;
+}
+
+/* Styles for windowcontainer */
+#windowcontainer {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+/* Styles for left and right divs */
+.window-left, .window-right {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #504e4e;
+    height: 85%;
+}
+
+.groupedtables{
+    margin-bottom:7px;
+    border-radius: 7px;
+    border:2px solid #635f5f
+}
+
+
+.groupedtables th, .groupedtables td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.tablevalue-select {
+    width: 100%;
+}
+
+.task-container{
+    border: 2px solid grey;
+    border-radius: 7px;
+    margin-bottom: 7px;
+    padding: 3px;
+}
+
+.task-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    width: 100%;
+}
+
+.task-left {
+    width: 35%;
+    padding-right: 5px;
+}
+
+.task-right {
+    width: 65%;
+    display: flex;
+}
+
+.task-cell {
+    flex: 1;
+    margin-right: 5px;
+}
+
+.task-cell:last-child {
+    margin-right: 0;
+}
+
+.description-select {
+    width: 100%;
+}
+
+.input {
+    min-width: 100%;
+    box-sizing: border-box; /* Ensures padding is included in the width */
 }

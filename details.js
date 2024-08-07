@@ -1,97 +1,250 @@
-function displayDetails(competition) {
-    const level = competition.level;
-    const contentDivId = `level-${level}-content`;
-    console.log(contentDivId);
-    const contentDiv = document.getElementById(contentDivId);
-
-    if (contentDiv) {
-        // Hide and clear all content divs
-        for (let i = 0; i <= 5; i++) {
-            const div = document.getElementById(`level-${i}-content`);
-            if (div) {
-                div.style.display = 'none';
-                div.innerHTML = '';
-            }
-        }
-        
-        // Display the selected content div
-        contentDiv.style.display = 'block';
-        
-        // Call the appropriate UI function based on the level
-        if (level === 0) {
-            displayLevel0UI(contentDiv, competition);
-        } else if (level === 1) {
-            displayLevel1UI(contentDiv, competition);
-        } else {
-            // For other levels, just display the competition details
-            contentDiv.innerHTML = `<pre>${JSON.stringify(competition, null, 2)}</pre>`;
-        }
-    } else {
-        console.error(`No element found for ${contentDivId}`);
+function populateWindow(level, id){ console.log(level, id);
+    switch(level){
+        case 0: buildwindow0(); break;
+        case 1: buildwindow1(id); break;
+        case 2: buildwindow2(id); break;
+        case 3: buildwindow3(id); break;
+        case 4: buildwindow4(id); break;
+        case 5: buildwindow5(id); break;
+        case 6: buildwindow6(id); break;
+        default: console.log("Invalid level: " + level);
     }
 }
 
-function createNewInternationalCompetition(data) {
-    let newId = getNextAvailableId(data['compobj.txt']);
-    let newCompetition = {
-        id: newId,
-        shortName: "New Competition",
-        fullName: "New International Competition",
-        level: 3, 
-        parent: "0", // Assuming "FIFA" has ID "0"
-        children: []
+function buildwindow0() {
+    const mainHeader = document.getElementById('mainheader');
+    mainHeader.textContent = "Global Competitions";
+
+    let parent = parentDiv();
+    let left = parent.querySelector('#leftDiv');
+    let right = parent.querySelector('#rightDiv');
+
+    // Create the settings div using createSettingsDiv with competitionid 0
+    const settingsDiv = createSettingsDiv(0);
+
+    // Create the competitions list div using createCompetitionsListDiv with parent 0
+    const competitionsListDiv = createCompetitionsListDiv(0);
+
+    // Create the button
+    const button = document.createElement('button');
+    button.textContent = "Create New International Competition";
+    button.classList.add('create-button'); // Add any classes you need for styling
+    button.style.marginTop = '12px'; // Correctly set margin-top using style property
+
+    // Add event listener for the button
+    button.addEventListener('click', function() {
+        createNewInternationalCompetition();
+    });
+
+    // Clear any existing content and append the header, settings div, competitions list, and button
+    const contentElement = document.getElementById('level-0-content');
+    contentElement.innerHTML = ''; // Clear existing content
+    contentElement.appendChild(mainHeader);
+    contentElement.appendChild(parent);
+
+    right.appendChild(settingsDiv);
+    left.appendChild(competitionsListDiv);
+    contentElement.appendChild(button);
+    
+}
+
+function buildwindow1(id) {
+    const mainHeader = document.getElementById('mainheader');
+    mainHeader.textContent = mainHeader.textContent = getCompetitionNameById(id) + " (" + id + ")";
+
+    let parent = parentDiv();
+    let left = parent.querySelector('#leftDiv');
+    let right = parent.querySelector('#rightDiv');
+
+    // Create the settings div using createSettingsDiv 
+    const settingsDiv = createSettingsDiv(id);
+
+    // Create the competitions list div using createCompetitionsListDiv 
+    const competitionsListDiv = createCompetitionsListDiv(id);
+
+    // Create the weather div 
+    const weatherDiv = createWeatherDiv(id);
+
+    // Create the button
+    const button = document.createElement('button');
+    button.textContent = "Create New International Competition";
+    button.classList.add('create-button'); // Add any classes you need for styling
+    button.style.marginTop = '12px'; // Correctly set margin-top using style property
+
+    // Add event listener for the button
+    button.addEventListener('click', function() {
+        createNewInternationalCompetition();
+    });
+
+    // Clear any existing content and append the header, settings div, competitions list, and button
+    const contentElement = document.getElementById('level-1-content');
+    contentElement.innerHTML = ''; // Clear existing content
+    contentElement.appendChild(mainHeader);
+    contentElement.appendChild(parent);
+
+    left.appendChild(competitionsListDiv);
+    left.appendChild(settingsDiv);
+    right.appendChild(weatherDiv);
+    contentElement.appendChild(button);
+
+}
+
+function buildwindow2(id) {
+    const mainHeader = document.getElementById('mainheader');
+    mainHeader.textContent = getNationNameById(id);
+
+    let parent = parentDiv();
+    let left = parent.querySelector('#leftDiv');
+    let right = parent.querySelector('#rightDiv');
+
+    // Create the settings div using createSettingsDiv 
+    const settingsDiv = createSettingsDiv(id);
+
+    // Create the competitions list div using createCompetitionsListDiv 
+    const competitionsListDiv = createCompetitionsListDiv(id);
+
+    // Create the weather div 
+    const weatherDiv = createWeatherDiv(id);
+
+    // Clear any existing content and append the header, settings div, competitions list, and button
+    const contentElement = document.getElementById('level-2-content');
+    contentElement.innerHTML = ''; // Clear existing content
+    contentElement.appendChild(mainHeader);
+    contentElement.appendChild(parent);
+
+    
+    left.appendChild(competitionsListDiv);
+    left.appendChild(settingsDiv);
+    right.appendChild(weatherDiv);
+
+}
+
+function buildwindow3(id){
+    const mainHeader = document.getElementById('mainheader');
+    mainHeader.textContent = getTrophyNameById(id) + " (" + id + ")";
+
+    let parent = parentDiv();
+    let left = parent.querySelector('#leftDiv');
+    let right = parent.querySelector('#rightDiv');
+
+    const settingsDiv = createSettingsDiv(id);
+    const tasksDiv = createTasksDiv(id);
+
+    // Clear any existing content and append the header, settings div, competitions list, and button
+    const contentElement = document.getElementById('level-3-content');
+    contentElement.innerHTML = ''; // Clear existing content
+    contentElement.appendChild(mainHeader);
+    contentElement.appendChild(parent);
+
+    left.appendChild(settingsDiv);
+    right.appendChild(tasksDiv);
+}
+
+function buildwindow4(id){
+    const mainHeader = document.getElementById('mainheader');
+    mainHeader.textContent = getTrophyNameById(id) + " (" + id + ")";;
+
+    let parent = parentDiv();
+    let left = parent.querySelector('#leftDiv');
+    let right = parent.querySelector('#rightDiv');
+
+    const settingsDiv = createSettingsDiv(id);
+    const scheduleDiv = createScheduleDiv(id);
+    const advancementDiv = createAdvancementDiv(id);
+
+    // Clear any existing content and append the header, settings div, competitions list, and button
+    const contentElement = document.getElementById('level-4-content');
+    contentElement.innerHTML = ''; // Clear existing content
+    contentElement.appendChild(mainHeader);
+    contentElement.appendChild(parent);
+
+    left.appendChild(settingsDiv);
+    left.appendChild(scheduleDiv);
+    right.appendChild(advancementDiv);
+}
+
+function buildwindow5(id){
+    const mainHeader = document.getElementById('mainheader');
+    mainHeader.textContent = getRoundData(id) + " (" + id + ")";
+
+    let parent = parentDiv();
+    let left = parent.querySelector('#leftDiv');
+    let right = parent.querySelector('#rightDiv');
+
+    const settingsDiv = createSettingsDiv(id);
+    const scheduleDiv = createScheduleDiv(id);
+    const objectivesDiv = createObjectivesDiv(id);
+    const standingsDiv = createStandingsDiv(id);
+    const advancementDiv = createAdvancementDiv(id);
+    const tasksDiv = createTasksDiv(id);
+
+    // Clear any existing content and append the header, settings div, competitions list, and button
+    const contentElement = document.getElementById('level-5-content');
+    contentElement.innerHTML = ''; // Clear existing content
+    contentElement.appendChild(mainHeader);
+    contentElement.appendChild(parent);
+
+    left.appendChild(standingsDiv);
+    left.appendChild(settingsDiv);
+    left.appendChild(scheduleDiv);
+    left.appendChild(objectivesDiv);
+    right.appendChild(advancementDiv);
+}
+
+function buildwindow6(id){
+
+    const mainHeader = document.getElementById('mainheader');
+    mainHeader.textContent = getRoundData(id) + " (" + id + ")";
+
+    let parent = parentDiv();
+    let left = parent.querySelector('#leftDiv');
+    let right = parent.querySelector('#rightDiv');
+
+    const settingsDiv = createSettingsDiv(id);
+    const advancementDiv = createAdvancementDiv(id);
+    const tasksDiv = createTasksDiv(id);
+
+    // Clear any existing content and append the header, settings div, competitions list, and button
+    const contentElement = document.getElementById('level-5-content');
+    contentElement.innerHTML = ''; // Clear existing content
+    contentElement.appendChild(mainHeader);
+    contentElement.appendChild(parent);
+
+    left.appendChild(settingsDiv);
+    right.appendChild(advancementDiv);
+    right.appendChild(tasksDiv);
+
+}
+
+// Function to handle the creation of a new international competition
+function createNewInternationalCompetition() {
+    // Store the current state
+    const expandedState = getExpandedState();
+
+    // Find the last line number and add one
+    let lastLineNumber = 0;
+    data["compobj"].forEach(comp => {
+        if (comp.line > lastLineNumber) {
+            lastLineNumber = comp.line;
+        }
+    });
+    const newLineNumber = lastLineNumber + 1;
+
+    // Create a new international competition object
+    const newCompetition = {
+        line: newLineNumber,
+        level: 3,
+        shortname: "New Comp",
+        longname: "New Competition",
+        parent: 0
     };
 
-    // Parse the existing compobj.txt data
-    const compobjLines = data['compobj.txt'].split('\r\n');
-    
-    // Add the new competition to the data
-    compobjLines.push(`${newCompetition.id},${newCompetition.level},${newCompetition.shortName},${newCompetition.fullName},${newCompetition.parent}`);
-    
-    // Update the IDs for all subsequent competitions
-    let idCounter = parseInt(newCompetition.id) + 1;
-    for (let i = parseInt(newCompetition.id) + 1; i < compobjLines.length; i++) {
-        let fields = compobjLines[i].split(',');
-        fields[0] = idCounter.toString();
-        compobjLines[i] = fields.join(',');
-        idCounter++;
-    }
-    
-    // Update the compobj.txt data in the data object
-    data['compobj.txt'] = compobjLines.join('\r\n');
-    
-    // Find the parent in the hierarchy and add the new competition
-    let parentCompetition = data.hierarchy.find(comp => comp.id === "0");
-    if (parentCompetition) {
-        parentCompetition.children.push(newCompetition);
-    }
-    
-    console.log(data['compobj.txt']); // For debugging
-}
+    // Add the new competition to the data array
+    data["compobj"].push(newCompetition);
 
-function displayLevel0UI(contentDiv, competition) {
-    contentDiv.innerHTML = `<pre>${JSON.stringify(competition, null, 2)}</pre>`;
-    
-    // Add the "Create New International Competition" button for level 0 competitions
-    const newCompButton = document.createElement('button');
-    newCompButton.textContent = "Create New International Competition";
-    newCompButton.addEventListener('click', function() {
-        createNewInternationalCompetition(data);
-        displayHierarchy(data); // Refresh the display after adding new competition
-    });
-    contentDiv.prepend(newCompButton);
-}
+    // Update the left panel hierarchy
+    organizeCompetitions(data);
 
-function displayLevel1UI(contentDiv, competition) {
-    contentDiv.innerHTML = `<pre>${JSON.stringify(competition, null, 2)}</pre>`;
-    
-    // Add any other UI elements specific to level 1 competitions here
-    // Example: Add a button for some level 1 specific action
-    const level1ActionButton = document.createElement('button');
-    level1ActionButton.textContent = "Level 1 Action";
-    level1ActionButton.addEventListener('click', function() {
-        // Perform some action for level 1 competition
-        console.log(`Action performed for competition ${competition.id}`);
-    });
-    contentDiv.appendChild(level1ActionButton);
+    // Restore the previous expanded state
+    restoreExpandedState(expandedState);
 }

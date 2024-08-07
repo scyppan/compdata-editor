@@ -1,3 +1,20 @@
+function replaceNames(name) {
+    // Check for nation names
+    const nationMatch = name.match(/NationName_(\d+)/);
+    if (nationMatch) {
+
+        const nationID = nationMatch[1];
+        return nations[nationID] || name;
+    }
+    // Check for trophy names
+    const trophyMatch = name.match(/TrophyName_Abbr15_(\d+)/);
+    if (trophyMatch) {
+        const trophyID = trophyMatch[1];
+        return trophynames[trophyID] || name;
+    }
+    return name;
+}
+
 let nations = {
     1: "Albania",
     2: "Andorra",
@@ -213,6 +230,7 @@ let nations = {
     213: "Chinese Taipei",
     214: "Comoros",
     215: "New Caledonia",
+    216: "Creation Center",
     218: "South Sudan",
     219: "Kosovo",
     222: "International Women",
@@ -398,9 +416,11 @@ let trophynames = {
     "970": "South America Cup",
     "980": "European Champ.",
     "981": "EC Qualifiers",
-    "990": "FIFA World Cup",
-    "991": "FIFA World Cup™ Qualifiers",
-    "992": "FIFA World Cup™ Qualifiers",
+    "990": "Men’s World Cup",
+    "991": "Men’s World Cup Qualifiers",
+    "992": "Men’s World Cup Qualifiers",
     "993": "Asia Qualifier",
-    "999": "Confed Cup"
+    "999": "Confed Cup",
+    "1806": "Men’s Intl Friendly",
+    "1809": "Women’s World Cup"
 };

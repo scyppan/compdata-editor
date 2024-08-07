@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compdata File Editor</title>
+    <title>Compdata Editor</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="leftpanel.js" defer></script>
@@ -12,6 +12,8 @@
     <script src="details.js" defer></script>
     <script src="hierarchy.js" defer></script>
     <script src="helper.js" defer></script>
+    <script src="simplewindows.js" defer></script>
+    <script src="taskswindow.js" defer></script>
     <script src="main.js" defer></script>
 </head>
 <body>
@@ -27,14 +29,15 @@
             </div>
         </div>
         <div class="main-panel" id="mainPanel">
-            <h1>Compdata File Viewer</h1>
+            <h1 id="mainheader">Compdata Editor</h1>
             <div id="fileContent" class="file-content">
-                <div id="level-0-content" class="level-0-content"></div>
-                <div id="level-1-content" class="level-1-content"></div>
-                <div id="level-2-content" class="level-2-content"></div>
-                <div id="level-3-content" class="level-3-content"></div>
-                <div id="level-4-content" class="level-4-content"></div>
-                <div id="level-5-content" class="level-5-content"></div>
+                <div id="level-0-content" class="level-0-content hidden">welcome to scyppan's compdata editor</div>
+                <div id="level-1-content" class="level-1-content hidden">lvl1</div>
+                <div id="level-2-content" class="level-2-content hidden">lvl2</div>
+                <div id="level-3-content" class="level-3-content hidden">lvl3</div>
+                <div id="level-4-content" class="level-4-content hidden">lvl4</div>
+                <div id="level-5-content" class="level-5-content hidden">lvl5</div>
+                <div id="level-6-content" class="level-6-content hidden">lvl6???!!!</div>
             </div>
         </div>
     </div>
