@@ -1,0 +1,1 @@
+• standings import often has an entry with id null and position null. We should prevent that from being stored in jsonmaker

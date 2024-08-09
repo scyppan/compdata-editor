@@ -10,7 +10,7 @@ document.getElementById('fileSelect').addEventListener('change', function(event)
                 document.getElementById('leftPanel').classList.remove('hidden');
                 showMainUI();
             } catch (error) {
-                console.error("Error parsing JSON file:", error);
+                createMessage("Error parsing JSON file:", 'error');
                 alert('Invalid JSON file.');
             }
         };
@@ -64,7 +64,7 @@ function showWindow(level){
         case 4: document.getElementById("level-4-content").classList.remove('hidden'); break;
         case 5: document.getElementById("level-5-content").classList.remove('hidden'); break;
         case 6: document.getElementById("level-6-content").classList.remove('hidden'); break;
-        default: console.log("Invalid level: " + level);
+        default: console.error("Invalid level: " + level); break;
     }
     
 }

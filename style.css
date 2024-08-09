@@ -8,8 +8,35 @@ body {
     
 }
 
+h1{
+    color: #d1d1d1 !important;;
+}
+
 h3{
     margin: 7px;
+}
+
+td{
+    min-width: 80px;
+    color: #bd9f78;
+}
+
+th{
+    color: #bd9f78;
+}
+
+input{
+    background-color: #30271d;
+    color: #bd9f78;
+    font-weight: bold;
+    text-align: center;
+}
+
+select{
+    min-width: 60px;
+    background-color: #30271d;
+    color: #bd9f78;
+    font-weight: bold;
 }
 
 .container {
@@ -255,7 +282,7 @@ ul, li {
 /* Additional styling for better readability */
 .window-tables td {
     background-color: #535050;
-    color: #e2ddddea;
+    color: #bd9f78;
     padding-left: 3px;
     padding-right: 5px;
 }
@@ -363,4 +390,31 @@ ul, li {
 .input {
     min-width: 100%;
     box-sizing: border-box; /* Ensures padding is included in the width */
+}
+
+.message-modal {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    padding: 10px 20px;
+    color: #bbbbbb;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 1s ease, transform 1s ease;
+    z-index: 1000;
+}
+
+.message-modal.info {
+    background-color: #36463d;
+}
+
+.message-modal.error {
+    background-color: #4b2121;
+}
+
+.message-modal.fade-out {
+    opacity: 0;
+    transform: translateY(-20px);
 }

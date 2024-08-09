@@ -127,7 +127,22 @@ function createTaskSection(title, taskOptions, tasks) {
         taskRow.appendChild(taskRight);
 
         descriptionSelect.addEventListener('change', () => {
+            updateTaskData(task, 'description', descriptionSelect.value);
             updateParamLabels(descriptionSelect.value, param1Input, param2Input, param3Input, param4Input);
+        });
+
+        // Event listeners for param changes
+        param1Input.addEventListener('change', () => {
+            updateTaskData(task, 'param1', param1Input.value);
+        });
+        param2Input.addEventListener('change', () => {
+            updateTaskData(task, 'param2', param2Input.value);
+        });
+        param3Input.addEventListener('change', () => {
+            updateTaskData(task, 'param3', param3Input.value);
+        });
+        param4Input.addEventListener('change', () => {
+            updateTaskData(task, 'param4', param4Input.value);
         });
 
         // Initial call to set labels based on the current description
@@ -285,3 +300,54 @@ function adjustInputWidths(...inputs) {
         input.style.width = `${widthPerInput}%`;
     });
 }
+
+function updateTaskData(task, key, value) {
+    // Update the specific key in the task object
+    switch (key) {
+        case 'description':
+            task.description = value; // Update the description
+            updateTaskDataForHiddenFields(task); // Update the hidden fields based on the new description
+            break;
+        case 'param1':
+            task.param1 = parseInt(value, 10) || 0;
+            break;
+        case 'param2':
+            task.param2 = parseInt(value, 10) || 0;
+            break;
+        case 'param3':
+            task.param3 = parseInt(value, 10) || 0;
+            break;
+        case 'param4':
+            task.param4 = parseInt(value, 10) || 0;
+            break;
+        default:
+            console.error(`Unknown key: ${key}`);
+    }
+}
+
+function updateTaskDataForHiddenFields(task) {
+    switch (task.description) {
+        case 'FillFromSpecialTeamsWithNation':
+            task.param4 = 0;
+            break;
+        case 'FillWithTeam':
+            task.param4 = 0;
+            break;
+        case 'FillFromLeagueInOrder':
+        case 'FillFromLeague':
+            task.param3 = 0;
+            task.param4 = 0;
+            break;
+        case 'FillFromCompTable':
+            task.param4 = 0;
+            break;
+        case 'ClearLeagueStats':
+        case 'UpdateMultiGroupLeagueStats':
+        case 'UpdateLeagueStats':
+            task.param3 = 0;
+            task.param4 = 0;
+            break;
+        // Add other cases as needed
+    }
+}
+

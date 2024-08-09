@@ -37,7 +37,6 @@ function getCompetitionNameById(id) {
 function getNationNameById(id) {
     // Assuming nation data is stored in data["nationobj"]
     const defaultname = data["compobj"].find(nat => nat.line === id);
-    console.log(defaultname.longname);
     return replaceNames(defaultname.longname);
 }
 
@@ -80,10 +79,8 @@ function getDataForId(type, id) {
 
     // Special case for 'schedule'
     if (type === 'advancement') {
-        key = 'pullfromcompetition';
+        key = 'groupid';
     }
 
     return data[type].filter(entry => entry[key] === id);
 }
-
-
