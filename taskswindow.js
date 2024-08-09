@@ -63,6 +63,15 @@ function createTasksDiv(id) {
 
     const tasksData = getDataForId('tasks', id);
 
+    // Check for empty tasks data
+    if (tasksData.length === 0) {
+        const noTasksParagraph = document.createElement('p');
+        noTasksParagraph.textContent = 'No tasks data';
+        noTasksParagraph.style.fontSize = "12px";
+        div.appendChild(noTasksParagraph);
+        return div; // Return early if there are no tasks
+    }
+
     // Define start and end tasks
     const startTasks = [
         'FillWithTeam', 'FillFromCompTable', 'FillChampionsCupSeeded',
@@ -86,6 +95,7 @@ function createTasksDiv(id) {
 
     return div;
 }
+
 
 function createTaskSection(title, taskOptions, tasks) {
     const sectionDiv = document.createElement('div');
@@ -131,10 +141,18 @@ function createTaskSection(title, taskOptions, tasks) {
             updateParamLabels(descriptionSelect.value, param1Input, param2Input, param3Input, param4Input);
         });
 
-        // Event listeners for param changes
+        // Event listener for param1 change
         param1Input.addEventListener('change', () => {
-            updateTaskData(task, 'param1', param1Input.value);
+            if (!param1Input.value) {
+                // If param1 is deleted (empty), remove the row and the underlying data
+                deleteTaskData(task.id); // Delete the task data
+                taskContainer.remove(); // Remove the task container from the UI
+            } else {
+                updateTaskData(task, 'param1', param1Input.value);
+            }
         });
+
+        // Event listeners for other param changes
         param2Input.addEventListener('change', () => {
             updateTaskData(task, 'param2', param2Input.value);
         });
@@ -301,30 +319,6 @@ function adjustInputWidths(...inputs) {
     });
 }
 
-function updateTaskData(task, key, value) {
-    // Update the specific key in the task object
-    switch (key) {
-        case 'description':
-            task.description = value; // Update the description
-            updateTaskDataForHiddenFields(task); // Update the hidden fields based on the new description
-            break;
-        case 'param1':
-            task.param1 = parseInt(value, 10) || 0;
-            break;
-        case 'param2':
-            task.param2 = parseInt(value, 10) || 0;
-            break;
-        case 'param3':
-            task.param3 = parseInt(value, 10) || 0;
-            break;
-        case 'param4':
-            task.param4 = parseInt(value, 10) || 0;
-            break;
-        default:
-            console.error(`Unknown key: ${key}`);
-    }
-}
-
 function updateTaskDataForHiddenFields(task) {
     switch (task.description) {
         case 'FillFromSpecialTeamsWithNation':
@@ -351,3 +345,75 @@ function updateTaskDataForHiddenFields(task) {
     }
 }
 
+function handleParam1Change(id, value) {
+    if (value === '') {
+        // If param1 is deleted (empty), remove the row and delete the data entry
+        deleteTaskData(id);
+        const row = document.querySelector(`tr[data-id='${id}']`);
+        if (row) {
+            row.remove();
+        }
+    } else {
+        updateTaskData(id, 'param1', value);
+    }
+}
+
+function createTaskRow(entry) {
+    const row = document.createElement('tr');
+    row.dataset.id = entry.id; // Set data-id attribute
+
+    const createCellWithInput = (type, value, key) => {
+        const cell = document.createElement('td');
+        const input = document.createElement('input');
+        input.type = type;
+        input.value = value;
+        input.classList.add('tablevalue-input');
+        input.dataset.key = key;
+        input.dataset.context = 'tasks';
+        cell.appendChild(input);
+        return { cell, input };
+    };
+
+    // Create the input for param1
+    const { cell: param1Cell, input: param1Input } = createCellWithInput('text', entry.param1, 'param1');
+
+    // Event listener for param1 change
+    param1Input.addEventListener('change', function () {
+        handleParam1Change(entry.id, param1Input.value);
+    });
+
+    // Create additional inputs for param2, param3, etc.
+    const { cell: param2Cell, input: param2Input } = createCellWithInput('text', entry.param2, 'param2');
+    const { cell: param3Cell, input: param3Input } = createCellWithInput('text', entry.param3, 'param3');
+
+    // Append cells to the row
+    row.appendChild(param1Cell);
+    row.appendChild(param2Cell);
+    row.appendChild(param3Cell);
+
+    return row;
+}
+
+function updateTaskData(id, key, value) {
+    // Find the relevant task entry
+    let entry = data['tasks'].find(item => item.id == id);
+
+    if (entry) {
+        entry[key] = value;
+    } else {
+        console.error(`Task entry not found for id ${id}`);
+    }
+}
+
+function deleteTaskData(id) {
+    // Find the index of the relevant task entry
+    const index = data['tasks'].findIndex(item => item.id == id);
+
+    if (index !== -1) {
+        // Remove the entry from the array
+        data['tasks'].splice(index, 1);
+        console.log(`Task entry with id ${id} has been deleted.`);
+    } else {
+        console.error(`Task entry not found for id ${id}`);
+    }
+}

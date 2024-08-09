@@ -1,3 +1,71 @@
+function createScheduleRow(entry) {
+    const row = document.createElement('tr');
+    row.dataset.id = entry.id; // Set data-id attribute
+    row.dataset.type = 'schedule'; // Set data-type attribute
+
+    const createCellWithInput = (type, value, key) => {
+        const cell = document.createElement('td');
+        const input = document.createElement('input');
+        input.type = type;
+        input.value = value;
+        input.classList.add('tablevalue-input');
+        input.dataset.key = key;
+        input.dataset.context = 'schedule';
+        cell.appendChild(input);
+        return { cell, input };
+    };
+
+    // Day cell with input
+    const { cell: dayCell, input: dayInput } = createCellWithInput('text', entry.day, 'day');
+
+    // Event listener for day change
+    dayInput.addEventListener('change', function () {
+        if (!dayInput.value) {
+            // If day is deleted (empty), remove the row and update the data
+            row.remove(); // Remove the row from the table
+            deleteScheduleData(entry.id); // Remove the corresponding data entry
+        } else {
+            updateScheduleData(entry.id, 'day', dayInput.value);
+            entry.day = dayInput.value;  // Update the local variable to reflect the change
+        }
+    });
+
+    // Time cell with input
+    const { cell: timeCell, input: timeInput } = createCellWithInput('text', entry.time, 'time');
+
+    // Event listener for time change
+    timeInput.addEventListener('change', function () {
+        updateScheduleData(entry.id, 'time', timeInput.value);
+        entry.time = timeInput.value;  // Update the local variable to reflect the change
+    });
+
+    // Event cell with input
+    const { cell: eventCell, input: eventInput } = createCellWithInput('text', entry.event, 'event');
+
+    // Event listener for event change
+    eventInput.addEventListener('change', function () {
+        updateScheduleData(entry.id, 'event', eventInput.value);
+        entry.event = eventInput.value;  // Update the local variable to reflect the change
+    });
+
+    // Location cell with input
+    const { cell: locationCell, input: locationInput } = createCellWithInput('text', entry.location, 'location');
+
+    // Event listener for location change
+    locationInput.addEventListener('change', function () {
+        updateScheduleData(entry.id, 'location', locationInput.value);
+        entry.location = locationInput.value;  // Update the local variable to reflect the change
+    });
+
+    // Append all cells to the row
+    row.appendChild(dayCell);
+    row.appendChild(timeCell);
+    row.appendChild(eventCell);
+    row.appendChild(locationCell);
+
+    return row;
+}
+
 function createScheduleDiv(id) {
     const div = document.createElement('div');
     div.id = 'schedule';
@@ -75,8 +143,14 @@ function createScheduleDiv(id) {
 
             // Event listener for day change
             dayInput.addEventListener('change', function () {
-                updateScheduleData(entry.id, 'day', dayInput.value);
-                entry.day = dayInput.value;  // Update the local variable to reflect the change
+                if (!dayInput.value) {
+                    // If day is deleted (empty), remove the row and update the data
+                    row.remove(); // Remove the row from the table
+                    deleteScheduleData(entry.id); // Remove the corresponding data entry
+                } else {
+                    updateScheduleData(entry.id, 'day', dayInput.value);
+                    entry.day = dayInput.value;  // Update the local variable to reflect the change
+                }
             });
 
             // Event listener for min change
@@ -117,34 +191,37 @@ function updateScheduleData(id, key, value) {
     let entry = data['schedule'].find(item => item.id == id);
 
     if (entry) {
-        let parsedValue = parseInt(value, 10);
-
-        if (isNaN(parsedValue)) {
-            console.error(`Invalid number for ${key}: ${value}`);
-            return;
-        }
-
-        // Update the entry's specific key with the parsed value
         switch (key) {
             case 'day':
-                entry.day = parsedValue;  // Ensure day is always an integer
-                break;
-            case 'min':
-                entry.min = parsedValue;  // Ensure min is always an integer
-                break;
-            case 'max':
-                entry.max = parsedValue;  // Ensure max is always an integer
+                entry.day = value;
                 break;
             case 'time':
-                entry.time = parsedValue;  // Ensure time is always an integer
+                entry.time = value;
+                break;
+            case 'event':
+                entry.event = value;
+                break;
+            case 'location':
+                entry.location = value;
                 break;
             default:
                 console.error(`Unknown key: ${key}`);
                 return;
         }
-
     } else {
         console.error(`Schedule entry not found for id ${id}`);
     }
 }
 
+function deleteScheduleData(id) {
+    // Find the index of the relevant schedule entry
+    const index = data['schedule'].findIndex(item => item.id == id);
+
+    if (index !== -1) {
+        // Remove the entry from the array
+        data['schedule'].splice(index, 1);
+        console.log(`Schedule entry with id ${id} has been deleted.`);
+    } else {
+        console.error(`Schedule entry not found for id ${id}`);
+    }
+}

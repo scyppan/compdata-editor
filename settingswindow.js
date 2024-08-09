@@ -61,6 +61,9 @@ function createSettingsDiv(competitionid) {
 
     settings.forEach(setting => {
         const row = document.createElement('tr');
+        row.dataset.id = setting.id; // Set data-id attribute
+        row.dataset.tag = setting.tag; // Set data-tag attribute
+
         const tagCell = document.createElement('td');
         const valueCell = document.createElement('td');
         valueCell.classList.add('tablevalue');
@@ -84,7 +87,7 @@ function createSettingsDiv(competitionid) {
         input.min = input.type === 'number' ? -1 : undefined;
         input.classList.add('tablevalue-input');
     
-        // Event listener for tag change, without the duplicate check in the listener
+        // Event listener for tag change
         select.addEventListener('change', function () {
             handleSettingTagChange(setting.id, setting.tag, select.value, select, input);
             setting.tag = select.value;  // Update the local variable to reflect the change
@@ -109,9 +112,23 @@ function createSettingsDiv(competitionid) {
 }
 
 function handleSettingValueChange(id, tag, value){
-    let setting = data['settings'].find(line=> line.id==id && line.tag==tag);
-    setting.value=value;
+    if (value === '') {
+        deleteSetting(id, tag);
+        // Remove the corresponding row from the table
+        const row = document.querySelector(`tr[data-id='${id}'][data-tag='${tag}']`);
+        if (row) {
+            row.remove();
+        }
+    } else {
+        let setting = data['settings'].find(line => line.id == id && line.tag == tag);
+        if (setting) {
+            setting.value = value;
+        } else {
+            console.error(`Setting not found for ID: ${id} and tag: ${tag}`);
+        }
+    }
 }
+
 
 function handleSettingTagChange(id, oldtag, newtag, select, input) {
     // Check for duplicate tags before proceeding
@@ -154,4 +171,14 @@ function preventDupSetting(id, oldtag, newtag, select) {
     }
 
     return true; // No duplicates found
+}
+
+function deleteSetting(id, tag) {
+    const index = data['settings'].findIndex(line => line.id == id && line.tag == tag);
+    if (index !== -1) {
+        data['settings'].splice(index, 1);
+        console.log(`Setting with ID: ${id} and tag: ${tag} has been deleted.`);
+    } else {
+        console.error(`Setting not found for ID: ${id} and tag: ${tag}`);
+    }
 }

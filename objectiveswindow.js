@@ -41,9 +41,46 @@ function createObjectivesDiv(id) {
 
         const createCellWithInput = (type, value, key) => {
             const cell = document.createElement('td');
-            const input = document.createElement('input');
-            input.type = type;
-            input.value = value;
+            let input;
+
+            if (type === 'select') {
+                input = document.createElement('select');
+                const objectivesOptions = [
+                    'REACH_GROUPS',
+                    'REACH_QUARTER_FINALS',
+                    'REACH_SEMI_FINALS',
+                    'CHAMPION',
+                    'REACH_FINALS',
+                    'REACH_KNOCKOUT',
+                    'PRIMARY_REGIONAL_CUP_SLOT',
+                    'ANY_REGIONAL_CUP_SLOT',
+                    'MID_TABLE',
+                    'AVOID_LOWLY_FINISH',
+                    'FIGHT_FOR_TITLE',
+                    'HIGH_FINISH',
+                    'REACH_ROUND_OF_16',
+                    'SECONDARY_REGIONAL_CUP_SLOT',
+                    'AVOID_RELEGATION',
+                    'PROMOTION',
+                    'FIGHT_FOR_PROMOTION',
+                    'REACH_PLAYOFFS'
+                ];
+
+                objectivesOptions.forEach(optionValue => {
+                    const option = document.createElement('option');
+                    option.value = optionValue;
+                    option.textContent = optionValue;
+                    if (optionValue === value) {
+                        option.selected = true;
+                    }
+                    input.appendChild(option);
+                });
+            } else {
+                input = document.createElement('input');
+                input.type = type;
+                input.value = value;
+            }
+
             input.classList.add('tablevalue-input');
             input.dataset.key = key;
             input.dataset.context = 'objectives';
@@ -51,7 +88,7 @@ function createObjectivesDiv(id) {
             return { cell, input };
         };
 
-        const { cell: objectiveCell, input: objectiveInput } = createCellWithInput('text', entry.objective, 'objective');
+        const { cell: objectiveCell, input: objectiveInput } = createCellWithInput('select', entry.objective, 'objective');
         const { cell: valueCell, input: valueInput } = createCellWithInput('number', entry.value, 'value');
 
         // Event listener for objective change
@@ -62,8 +99,14 @@ function createObjectivesDiv(id) {
 
         // Event listener for value change
         valueInput.addEventListener('change', function () {
-            updateObjectivesData(entry.id, 'value', valueInput.value);
-            entry.value = valueInput.value;  // Update the local variable to reflect the change
+            if (!valueInput.value) {
+                // If value is deleted (empty), remove the row and update the data
+                row.remove(); // Remove the row from the table
+                deleteObjectiveData(entry.id); // Remove the corresponding data entry
+            } else {
+                updateObjectivesData(entry.id, 'value', valueInput.value);
+                entry.value = valueInput.value;  // Update the local variable to reflect the change
+            }
         });
 
         row.appendChild(objectiveCell);
@@ -104,3 +147,15 @@ function updateObjectivesData(id, key, value) {
     }
 }
 
+function deleteObjectiveData(id) {
+    // Find the index of the relevant objective entry
+    const index = data['objectives'].findIndex(item => item.id == id);
+
+    if (index !== -1) {
+        // Remove the entry from the array
+        data['objectives'].splice(index, 1);
+        console.log(`Objective entry with id ${id} has been deleted.`);
+    } else {
+        console.error(`Objective entry not found for id ${id}`);
+    }
+}

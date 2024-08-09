@@ -1,1 +1,5 @@
 • standings import often has an entry with id null and position null. We should prevent that from being stored in jsonmaker
+
+warnings.js
+• Create warnings.js and a separate window that points out issues that the program notices. 
+• If advancement for a particular competition/group has non-sequential values (and is non-zero), throw a warning. 

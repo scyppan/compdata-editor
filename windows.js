@@ -208,8 +208,9 @@ function buildwindow5(id){
     left.appendChild(standingsDiv);
     left.appendChild(advancementDiv);
     left.appendChild(settingsDiv);
+    left.appendChild(objectivesDiv);
     right.appendChild(scheduleDiv);
-    right.appendChild(objectivesDiv);
+    
     
 }
 

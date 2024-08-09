@@ -64,8 +64,14 @@ function createAdvancementDiv(id) {
     
         // Event listener for slot change
         slotInput.addEventListener('change', function () {
-            updateAdvancementData(entry.groupid, entry.slot, 'slot', slotInput.value);
-            entry.slot = slotInput.value;  // Update the local variable to reflect the change
+            if (!slotInput.value || isNaN(slotInput.value)) {
+                // If slot is removed or invalid, remove the row and update data
+                row.remove(); // Remove the row from the table
+                updateAdvancementData(entry.groupid, entry.slot, 'slot', ''); // Clear data
+            } else {
+                updateAdvancementData(entry.groupid, entry.slot, 'slot', slotInput.value);
+                entry.slot = slotInput.value;  // Update the local variable to reflect the change
+            }
         });
     
         // Event listener for push competition change
@@ -93,17 +99,28 @@ function createAdvancementDiv(id) {
     return div;
 }
 
+
 function updateAdvancementData(id, slot, key, value) {
-
     let parsedValue = parseInt(value, 10);
-
-    if (isNaN(parsedValue)) {
-        console.error(`Invalid number for ${key}:`, value);
-        return;
-    }
 
     // Find the relevant advancement entry
     let entry = data['advancement'].find(item => item.groupid == id && item.slot == parseInt(slot, 10));
+
+    if (!parsedValue) {
+        // If slot value is invalid (e.g., cleared), remove the entry and the row
+        if (entry) {
+            // Remove entry from data
+            data['advancement'] = data['advancement'].filter(item => item !== entry);
+
+            // Remove the corresponding row from the table
+            const row = document.querySelector(`tr[data-id='${id}'][data-slot='${slot}']`);
+            if (row) {
+                row.remove();
+            }
+            console.log(`Entry for groupid ${id}, slot ${slot} removed.`);
+        }
+        return;
+    }
 
     if (entry) {
         // Update the entry's specific key with the parsed value
@@ -121,7 +138,6 @@ function updateAdvancementData(id, slot, key, value) {
                 console.error(`Unknown key: ${key}`);
                 return;
         }
-
     } else {
         console.error(`Advancement entry not found for groupid ${id}, slot ${slot}`);
     }
