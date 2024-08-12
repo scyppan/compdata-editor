@@ -120,18 +120,22 @@ function getExpandedState() {
     return expandedState;
 }
 
+function getExpandedState() {
+    const expandedState = {};
+    document.querySelectorAll('#competitionList li').forEach(item => {
+        const compid = item.dataset.compid;
+        const isExpanded = item.querySelector('ul') && item.querySelector('ul').style.display !== 'none';
+        expandedState[compid] = isExpanded;
+    });
+    return expandedState;
+}
+
 function restoreExpandedState(expandedState) {
     document.querySelectorAll('#competitionList li').forEach(item => {
         const compid = item.dataset.compid;
         const childList = item.querySelector('ul');
-        if (childList && expandedState[compid]) {
-            childList.style.display = 'block';
-        } else if (childList) {
-            childList.style.display = 'none';
+        if (childList) {
+            childList.style.display = expandedState[compid] ? 'block' : 'none';
         }
     });
 }
-
-
-
-

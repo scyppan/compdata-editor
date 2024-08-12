@@ -11,18 +11,6 @@ function getNextAvailableId(compobj) {
     return (maxId + 1).toString();
 }
 
-function getCompetitionsList(parent) {
-    const competitionsList = document.createElement('ul');
-    data["compobj"].forEach(comp => {
-        if (comp.level === 3 && comp.parent === parent) { // Ensure it's a level 3 child of the specified parent
-            const listItem = document.createElement('li');
-            listItem.textContent = replaceNames(comp.longname && comp.longname.trim() ? comp.longname.trim() : (comp.shortname ? comp.shortname.trim() : "Unnamed Competition"), data["compobj"]);
-            competitionsList.appendChild(listItem);
-        }
-    });
-    return competitionsList;
-}
-
 function getCompetitionNameById(id) {
     // Assuming compobj data is stored in data["compobj"]
     const competition = data["compobj"].find(comp => comp.line === id);

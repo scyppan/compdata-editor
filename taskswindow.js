@@ -96,7 +96,6 @@ function createTasksDiv(id) {
     return div;
 }
 
-
 function createTaskSection(title, taskOptions, tasks) {
     const sectionDiv = document.createElement('div');
     sectionDiv.classList.add('task-section');

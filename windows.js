@@ -172,6 +172,7 @@ function buildwindow4(id){
     const settingsDiv = createSettingsDiv(id);
     const scheduleDiv = createScheduleDiv(id);
     const advancementDiv = createAdvancementDiv(id);
+    const competitionDiv = createGroupListDiv(id);
 
     // Clear any existing content and append the header, settings div, competitions list, and button
     const contentElement = document.getElementById('level-4-content');
@@ -179,9 +180,11 @@ function buildwindow4(id){
     contentElement.appendChild(mainHeader);
     contentElement.appendChild(parent);
 
+    left.appendChild(competitionDiv);
     left.appendChild(settingsDiv);
     left.appendChild(scheduleDiv);
     right.appendChild(advancementDiv);
+    
 }
 
 function buildwindow5(id){
