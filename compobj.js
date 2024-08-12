@@ -84,6 +84,7 @@ function updateTaskReferences(newLine, amt) {
     data['tasks'].forEach(task => {
 
         task.id+=amt;
+
         if(task.description=='UpdateTable'||task.description=='FillFromCompTableBackup'||task.description=='FillFromCompTablePosBackupSameLeague'||task.description=='FillFromCompTableBackupLeague'){
             if (task.param1 >= newLine) task.param1 += amt;
             if (task.param2 >= newLine) task.param2 += amt;
@@ -153,28 +154,18 @@ function updateWeatherReferences(newLine, amt) {
     });
 }
 
-function updateTaskReferences(newLine, amt) {
-    data['tasks'].forEach(task => {
-
-        if(task.description=='UpdateTable'||task.description=='FillFromCompTableBackup'||task.description=='FillFromCompTablePosBackupSameLeague'||task.description=='FillFromCompTableBackupLeague'){
-            if (task.param1 >= newLine) task.param1 += amt;
-            if (task.param2 >= newLine) task.param2 += amt;
-        }else{
-            if (task.param1 >= newLine) task.param1 += amt;
-        }
-
-    });
-}
-
-function updateCompObj(newGroup, amt) {
-    const newLine = newGroup.line;
+function updateCompObj(removedObj, amt) {
+    const removedLine = removedObj.line;
+    const removedLevel = removedObj.level;
 
     data['compobj'].forEach(obj => {
-        if (obj.line > newLine || (obj.line === newLine && !obj.new)) {
+        if (obj.line > removedLine) {
+            if (obj.parent >= removedLine) {
+                // Adjust parent only if the parent was part of the removed hierarchy or comes after it
+                obj.parent += amt;
+            }
+            // Adjust line number if it’s after the removed obj
             obj.line += amt;
         }
     });
-
-    // Remove the 'new' tag from the newly added group
-    delete newGroup.new;
 }

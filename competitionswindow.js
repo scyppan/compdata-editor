@@ -145,12 +145,80 @@ function getGroupsForStage(stageId) {
     // Filter the compobj data to find groups (level 5) under the given stage (level 4)
     const groups = data['compobj'].filter(entry => entry.level == 5 && entry.parent == stageId);
     
+    // Create a container div for the groups list
+    const groupsDiv = document.createElement('div');
+    groupsDiv.id = 'groupList';
+    groupsDiv.classList.add('standard-div');
+
+    // Create and append the header
+    const header = document.createElement('h2');
+    header.textContent = 'Groups List';
+    groupsDiv.appendChild(header);
+
+    // Iterate over the groups and create div elements for each
+    groups.forEach(group => {
+        const groupDiv = createGroupDivElement(group);
+        groupsDiv.appendChild(groupDiv);
+    });
+
     console.log(groups); // For debugging, to see the filtered groups
     
-    return groups;
+    return groupsDiv;
 }
 
-// Function to add a new stage
+function createGroupDivElement(group) {
+    const divElement = document.createElement('div');
+    divElement.classList.add('group-item');
+    divElement.dataset.groupid = group.line;
+    divElement.dataset.name = group.longname && group.longname.trim() ? group.longname.trim() : (group.shortname ? group.shortname.trim() : "Unnamed Group");
+    
+    // Create the text node (editable)
+    const nameToDisplay = replaceNames(divElement.dataset.name, data["compobj"]);
+    const textNode = document.createElement('span');
+    textNode.textContent = nameToDisplay;
+    textNode.contentEditable = false; // Disable editing by default
+    divElement.appendChild(textNode);
+
+    // Create the delete button
+    const deleteButton = document.createElement('span');
+    deleteButton.classList.add('delete-button');
+    deleteButton.innerHTML = '⊖'; // Use the correct HTML entity for a minus sign inside a circle
+    deleteButton.style.display = 'none'; // Hidden by default
+    divElement.appendChild(deleteButton);
+
+    // Event listener to make the text editable and show the delete button
+    divElement.addEventListener('click', function() {
+        textNode.contentEditable = true; 
+        textNode.focus();
+        deleteButton.style.display = 'inline'; // Show delete button
+    });
+
+    // Event listener for the delete button
+    deleteButton.addEventListener('click', function(e) {
+        e.stopPropagation(); // Prevent triggering the divElement click event
+        const groupId = parseInt(divElement.dataset.groupid, 10);
+        removeGroup(groupId, divElement); // Pass the divElement to remove it later
+    });
+
+    // Handle saving the edited name
+    textNode.addEventListener('blur', function() {
+        textNode.contentEditable = false;
+        divElement.dataset.name = textNode.textContent.trim();
+        deleteButton.style.display = 'none'; // Hide delete button after editing
+        // Update the compobj data here as well if needed
+    });
+
+    // Exit editing mode on Esc key
+    textNode.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            textNode.contentEditable = false;
+            textNode.blur(); // Trigger blur to exit editing mode
+        }
+    });
+
+    return divElement;
+}
+
 function addNewStage(parent, stageName) {
     // Placeholder: Implement the logic to add a new stage to compobj and update the UI
     console.log(`Add new stage: ${stageName} under parent: ${parent}`);
@@ -210,13 +278,11 @@ function addNewGroup(stageId, groupName){
     restoreExpandedState(expandedstate);
 }
 
-// Function to delete a selected stage
 function deleteStage(stageId) {
     // Placeholder: Implement the logic to delete a stage from compobj and update the UI
     console.log(`Delete stage with ID: ${stageId}`);
 }
 
-// Function to select a stage (highlighting and storing the selected ID)
 function selectStage(stageElement) {
     // Clear previous selection
     const prevSelected = document.querySelector('.stage-selected');
@@ -228,7 +294,6 @@ function selectStage(stageElement) {
     stageElement.classList.add('stage-selected');
 }
 
-// Function to get the currently selected stage ID
 function getSelectedStageId() {
     const selectedElement = document.querySelector('.stage-selected');
     return selectedElement ? selectedElement.dataset.stageId : null;
@@ -238,19 +303,122 @@ function getCompetitionsList(parent) {
     const competitionsList = document.createElement('ul');
     data["compobj"].forEach(comp => {
         if (comp.level === 3 && comp.parent === parent) { // Ensure it's a level 3 child of the specified parent
-            const listItem = getCompetitionLiElement(comp); // Use the modular function
-            competitionsList.appendChild(listItem);
+            const divElement = createCompetitionDivElement(comp); // Now returns a div
+            const listWrapper = document.createElement('li'); // Create a wrapper 'li' for the div
+            listWrapper.appendChild(divElement);
+            competitionsList.appendChild(listWrapper);
         }
     });
     return competitionsList;
 }
 
-function getCompetitionLiElement(comp) {
-    const listItem = document.createElement('li');
-    listItem.textContent = replaceNames(
-        comp.longname && comp.longname.trim() ? comp.longname.trim() : (comp.shortname ? comp.shortname.trim() : "Unnamed Competition"),
-        data["compobj"]
-    );
+function createCompetitionDivElement(comp) {
+    const divElement = document.createElement('div');
+    divElement.classList.add('competition-item');
+    divElement.dataset.compid = comp.line;
+    divElement.dataset.name = comp.longname && comp.longname.trim() ? comp.longname.trim() : (comp.shortname ? comp.shortname.trim() : "Unnamed Competition");
+    
+    // Create the text node (editable)
+    const nameToDisplay = replaceNames(divElement.dataset.name, data["compobj"]);
+    const textNode = document.createElement('span');
+    textNode.textContent = nameToDisplay;
+    textNode.contentEditable = false; // Disable editing by default
+    divElement.appendChild(textNode);
+
+    // Create the delete button
+    const deleteButton = document.createElement('span');
+    deleteButton.classList.add('delete-button');
+    deleteButton.innerHTML = '⊖'; // Use the correct HTML entity for a minus sign inside a circle
+    deleteButton.style.display = 'none'; // Hidden by default
+    divElement.appendChild(deleteButton);
+
+    // Event listener to make the text editable and show the delete button
+    divElement.addEventListener('click', function() {
+        textNode.contentEditable = true; 
+        textNode.focus();
+        deleteButton.style.display = 'inline'; // Show delete button
+    });
+
+    // Event listener for the delete button
+    deleteButton.addEventListener('click', function(e) {
+        e.stopPropagation(); // Prevent triggering the divElement click event
+        const groupId = parseInt(divElement.dataset.compid, 10);
+        removeGroup(groupId, divElement.parentElement); // Pass the parent 'li' to remove it later
+    });
+
+    // Handle saving the edited name
+    textNode.addEventListener('blur', function() {
+        textNode.contentEditable = false;
+        divElement.dataset.name = textNode.textContent.trim();
+        deleteButton.style.display = 'none'; // Hide delete button after editing
+        // Update the compobj data here as well if needed
+    });
+
+    // Exit editing mode on Esc key
+    textNode.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            textNode.contentEditable = false;
+            textNode.blur(); // Trigger blur to exit editing mode
+        }
+    });
+
+    return divElement;
+}
+
+function createCompetitionItem(comp) {
+    const listItem = document.createElement('div');
+    listItem.classList.add('competition-item');
+    listItem.dataset.compid = comp.line;
+    listItem.dataset.name = comp.longname && comp.longname.trim() ? comp.longname.trim() : (comp.shortname ? comp.shortname.trim() : "Unnamed Competition");
+    
+    // Create the text node (editable)
+    const textNode = document.createElement('span');
+    textNode.textContent = listItem.dataset.name;
+    textNode.contentEditable = false; // Disable editing by default
+    listItem.appendChild(textNode);
+
+    // Create the delete button
+    const deleteButton = document.createElement('span');
+    deleteButton.classList.add('delete-button');
+    deleteButton.innerHTML = '&minus;'; // Use HTML entity for a minus sign
+    deleteButton.style.display = 'none'; // Hidden by default
+    listItem.appendChild(deleteButton);
+
+    // Event listener to make the text editable and show the delete button
+    listItem.addEventListener('click', function() {
+        textNode.contentEditable = true; 
+        textNode.focus();
+        deleteButton.style.display = 'inline'; // Show delete button
+    });
+
+    // Event listener for the delete button
+    deleteButton.addEventListener('click', function(e) {
+        e.stopPropagation(); // Prevent triggering the listItem click event
+        const groupId = parseInt(listItem.dataset.compid, 10);
+        removeGroup(groupId);
+    });
+
+    // Handle saving the edited name
+    textNode.addEventListener('blur', function() {
+        textNode.contentEditable = false;
+        listItem.dataset.name = textNode.textContent.trim();
+        // You might want to update the compobj data here as well
+    });
+
     return listItem;
 }
 
+function removeGroup(groupId, groupDivElement) {
+    // Find and remove the group from compobj
+    const groupIndex = data['compobj'].findIndex(obj => obj.line === groupId);
+    if (groupIndex === -1) return; // Group not found, do nothing
+
+    const removedGroup = data['compobj'].splice(groupIndex, 1)[0];
+
+    // Update all references and the compobj
+    updateCompObj(removedGroup, -1); 
+    updateAllReferences(removedGroup.line, -1);
+
+    // Remove the group div from the UI
+    groupDivElement.remove();
+}

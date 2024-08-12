@@ -49,7 +49,7 @@ function appendCompetition(comp, parentElement, expandedState = {}) {
         fullName = replaceNames(fullName, data["compobj"]);
     }
 
-    const itemContainer = document.createElement('div'); // Container to hold text and button
+    const itemContainer = document.createElement('div');
     itemContainer.style.display = 'flex';
     itemContainer.style.justifyContent = 'space-between';
     itemContainer.style.width = '100%';
@@ -59,11 +59,11 @@ function appendCompetition(comp, parentElement, expandedState = {}) {
     itemContainer.appendChild(textNode);
     listItem.appendChild(itemContainer);
 
-    // Append children if they exist
-    const childList = document.createElement('ul');
-    comp.children = data["compobj"].filter(child => child.parent === comp.line);
-    if (comp.children.length > 0) {
-        comp.children.forEach(child => {
+    // Get children without storing them in comp.children
+    const children = getChildrenByParent(comp.line);
+    if (children.length > 0) {
+        const childList = document.createElement('ul');
+        children.forEach(child => {
             appendCompetition(child, childList, expandedState);
         });
         listItem.appendChild(childList);
@@ -72,14 +72,14 @@ function appendCompetition(comp, parentElement, expandedState = {}) {
         if (expandedState[comp.line]) {
             childList.style.display = 'block';
         } else {
-            childList.style.display = 'none'; // Hide child list initially
+            childList.style.display = 'none'; 
         }
 
         // Create and append the toggle button
         const toggleButton = document.createElement('button');
         toggleButton.textContent = '-';
         toggleButton.classList.add('toggle-button');
-        toggleButton.style.display = expandedState[comp.line] || comp.level === 0 ? 'inline' : 'none'; // Ensure toggle button for level 0
+        toggleButton.style.display = expandedState[comp.line] || comp.level === 0 ? 'inline' : 'none';
 
         itemContainer.appendChild(toggleButton);
 
@@ -88,7 +88,7 @@ function appendCompetition(comp, parentElement, expandedState = {}) {
             e.stopPropagation();
             if (childList.style.display === 'none') {
                 childList.style.display = 'block';
-                toggleButton.style.display = 'inline'; // Show the toggle button after expanding
+                toggleButton.style.display = 'inline';
             }
         });
 
@@ -96,15 +96,15 @@ function appendCompetition(comp, parentElement, expandedState = {}) {
         toggleButton.addEventListener('click', function(e) {
             e.stopPropagation();
             childList.style.display = 'none';
-            toggleButton.style.display = 'none'; // Hide the toggle button after collapsing
+            toggleButton.style.display = 'none';
         });
     }
 
     // Add click event to show corresponding level content and populate window
     listItem.addEventListener('click', function(e) {
-        e.stopPropagation(); // Stop propagation to parent elements
-        showWindow(comp.level); // Call your existing showWindow function
-        populateWindow(comp.level, comp.line); // Call the new populateWindow function
+        e.stopPropagation(); 
+        showWindow(comp.level);
+        populateWindow(comp.level, comp.line);
     });
 
     parentElement.appendChild(listItem);

@@ -465,3 +465,25 @@ input[type="file"] {
 #helper-text{
     text-align: left;
 }
+
+.competition-item {
+    cursor: pointer;
+}
+
+.competition-item input {
+    border: none;
+    background: none;
+    font: inherit;
+    width: 100%;
+}
+
+.delete-button {
+    cursor: pointer;
+    color: red;
+    margin-left: 10px;
+    display: none;
+}
+
+.competition-item:hover .delete-button {
+    display: inline;
+}

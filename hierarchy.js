@@ -24,14 +24,18 @@ function buildHierarchy(data) {
     const map = {};
     data["compobj"].forEach(comp => {
         map[comp.line] = comp;
-        comp.children = [];
     });
 
-    data["compobj"].forEach(comp => {
-        if (comp.parent !== -1 && map[comp.parent]) {
-            map[comp.parent].children.push(comp);
-        }
-    });
+    return Object.values(map)
+        .filter(comp => comp.parent === -1)
+        .map(comp => {
+            return {
+                ...comp,
+                getChildren: () => getChildrenByParent(comp.line)
+            };
+        });
+}
 
-    return Object.values(map).filter(comp => comp.parent === -1);
+function getChildrenByParent(parentId) {
+    return data["compobj"].filter(comp => comp.parent === parentId);
 }

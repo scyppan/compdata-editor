@@ -152,6 +152,7 @@ function buildwindow3(id){
     let left = parent.querySelector('#leftDiv');
     let right = parent.querySelector('#rightDiv');
 
+    const competitionsDiv=createCompetitionsListDiv(id);
     const settingsDiv = createSettingsDiv(id);
     const tasksDiv = createTasksDiv(id);
 
@@ -161,6 +162,7 @@ function buildwindow3(id){
     contentElement.appendChild(mainHeader);
     contentElement.appendChild(parent);
 
+    left.appendChild(competitionsDiv);
     left.appendChild(settingsDiv);
     right.appendChild(tasksDiv);
 }
@@ -177,7 +179,7 @@ function buildwindow4(id){
     const settingsDiv = createSettingsDiv(id);
     const scheduleDiv = createScheduleDiv(id);
     const advancementDiv = createAdvancementDiv(id);
-    const competitionDiv = createGroupListDiv(id);
+    const competitionDiv = createCompetitionsListDiv(id);
 
     // Clear any existing content and append the header, settings div, competitions list, and button
     const contentElement = document.getElementById('level-4-content');
@@ -201,6 +203,7 @@ function buildwindow5(id){
     let left = parent.querySelector('#leftDiv');
     let right = parent.querySelector('#rightDiv');
 
+    
     const settingsDiv = createSettingsDiv(id);
     const scheduleDiv = createScheduleDiv(id);
     const objectivesDiv = createObjectivesDiv(id);
@@ -219,8 +222,7 @@ function buildwindow5(id){
     left.appendChild(settingsDiv);
     left.appendChild(objectivesDiv);
     right.appendChild(scheduleDiv);
-    
-    
+
 }
 
 function buildwindow6(id){
@@ -233,6 +235,7 @@ function buildwindow6(id){
     let left = parent.querySelector('#leftDiv');
     let right = parent.querySelector('#rightDiv');
 
+    const competitionsDiv=createCompetitionsListDiv(id);
     const settingsDiv = createSettingsDiv(id);
     const advancementDiv = createAdvancementDiv(id);
     const tasksDiv = createTasksDiv(id);
@@ -243,6 +246,7 @@ function buildwindow6(id){
     contentElement.appendChild(mainHeader);
     contentElement.appendChild(parent);
 
+    left.appendChild(competitionsDiv);
     left.appendChild(settingsDiv);
     right.appendChild(advancementDiv);
     right.appendChild(tasksDiv);
