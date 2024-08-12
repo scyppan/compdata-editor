@@ -32,6 +32,7 @@ function populateWindow(level, id){
 function buildwindow0() {
     const mainHeader = document.getElementById('mainheader');
     mainHeader.textContent = "Global Competitions";
+    mainHeader.dataset.id=0;
 
     let parent = parentDiv();
     let left = parent.querySelector('#leftDiv');
@@ -72,6 +73,7 @@ function buildwindow0() {
 function buildwindow1(id) {
     const mainHeader = document.getElementById('mainheader');
     mainHeader.textContent = mainHeader.textContent = getCompetitionNameById(id) + " (" + id + ")";
+    mainHeader.dataset.id=id;
 
     let parent = parentDiv();
     let left = parent.querySelector('#leftDiv');
@@ -113,6 +115,7 @@ function buildwindow1(id) {
 function buildwindow2(id) {
     const mainHeader = document.getElementById('mainheader');
     mainHeader.textContent = getNationNameById(id);
+    mainHeader.dataset.id=id;
 
     let parent = parentDiv();
     let left = parent.querySelector('#leftDiv');
@@ -143,6 +146,7 @@ function buildwindow2(id) {
 function buildwindow3(id){
     const mainHeader = document.getElementById('mainheader');
     mainHeader.textContent = getTrophyNameById(id) + " (" + id + ")";
+    mainHeader.dataset.id=id;
 
     let parent = parentDiv();
     let left = parent.querySelector('#leftDiv');
@@ -163,7 +167,8 @@ function buildwindow3(id){
 
 function buildwindow4(id){
     const mainHeader = document.getElementById('mainheader');
-    mainHeader.textContent = getTrophyNameById(id) + " (" + id + ")";;
+    mainHeader.textContent = getTrophyNameById(id) + " (" + id + ")";
+    mainHeader.dataset.id=id;
 
     let parent = parentDiv();
     let left = parent.querySelector('#leftDiv');
@@ -190,6 +195,7 @@ function buildwindow4(id){
 function buildwindow5(id){
     const mainHeader = document.getElementById('mainheader');
     mainHeader.textContent = getRoundData(id) + " (" + id + ")";
+    mainHeader.dataset.id=id;
 
     let parent = parentDiv();
     let left = parent.querySelector('#leftDiv');
@@ -221,6 +227,7 @@ function buildwindow6(id){
 
     const mainHeader = document.getElementById('mainheader');
     mainHeader.textContent = getRoundData(id) + " (" + id + ")";
+    mainHeader.dataset.id=id;
 
     let parent = parentDiv();
     let left = parent.querySelector('#leftDiv');

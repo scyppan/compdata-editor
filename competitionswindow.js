@@ -77,6 +77,7 @@ function createStagesListDiv(competitionId) {
 }
 
 function createGroupListDiv(stageId) {
+
     const div = document.createElement('div');
     div.id = 'groupList';
     div.classList.add('standard-div');
