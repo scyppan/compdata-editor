@@ -1,101 +1,3 @@
-
-function createTaskSection(title, taskOptions, tasks) {
-    const sectionDiv = document.createElement('div');
-    sectionDiv.classList.add('task-section');
-
-    const header = document.createElement('h3');
-    header.textContent = title;
-    sectionDiv.appendChild(header);
-
-    tasks.forEach(task => {
-        const taskContainer = document.createElement('div');
-        taskContainer.classList.add('task-container');
-
-        const taskRow = document.createElement('div');
-        taskRow.classList.add('task-row');
-
-        const taskLeft = document.createElement('div');
-        taskLeft.classList.add('task-left');
-        taskLeft.style.width = '35%'; // Set width to 35%
-
-        const descriptionSelect = createDescriptionSelectElement(task.description, taskOptions, 'description-select');
-        taskLeft.appendChild(descriptionSelect);
-
-        const taskRight = document.createElement('div');
-        taskRight.classList.add('task-right');
-        taskRight.style.width = '65%'; // Set width to 65%
-
-        const param1Input = createInputElement('number', task.param1, 'input');
-        const param2Input = createInputElement('number', task.param2, 'input');
-        const param3Input = createInputElement('number', task.param3, 'input');
-        const param4Input = createInputElement('number', task.param4, 'input');
-
-        taskRight.appendChild(createCell(param1Input));
-        taskRight.appendChild(createCell(param2Input));
-        taskRight.appendChild(createCell(param3Input));
-        taskRight.appendChild(createCell(param4Input));
-
-        taskRow.appendChild(taskLeft);
-        taskRow.appendChild(taskRight);
-
-        descriptionSelect.addEventListener('change', () => {
-            updateParamLabels(descriptionSelect.value, param1Input, param2Input, param3Input, param4Input);
-        });
-
-        // Initial call to set labels and visibility based on the current description
-        updateParamLabels(task.description, param1Input, param2Input, param3Input, param4Input);
-
-        taskContainer.appendChild(taskRow);
-        sectionDiv.appendChild(taskContainer);
-    });
-
-    return sectionDiv;
-}
-
-function createTasksDiv(id) {
-    const div = document.createElement('div');
-    div.id = 'tasks';
-    div.classList.add('standard-div');
-
-    const header = document.createElement('h2');
-    header.textContent = `Tasks - ${getTrophyNameById(id)}`;
-    div.appendChild(header);
-
-    const tasksData = getDataForId('tasks', id);
-
-    // Check for empty tasks data
-    if (tasksData.length === 0) {
-        const noTasksParagraph = document.createElement('p');
-        noTasksParagraph.textContent = 'No tasks data';
-        noTasksParagraph.style.fontSize = "12px";
-        div.appendChild(noTasksParagraph);
-        return div; // Return early if there are no tasks
-    }
-
-    // Define start and end tasks
-    const startTasks = [
-        'FillWithTeam', 'FillFromCompTable', 'FillChampionsCupSeeded',
-        'FillFromSpecialTeamsWithNation', 'FillFromLeagueMaxFromCountry',
-        'FillFromLeagueMaxFromCountryShadowed', 'FillFromCompTablePosBackupSameLeague',
-        'FillFromCompTableBackupLeague', 'FillFromLeagueInOrder', 'FillFromLeague',
-        'ClearLeagueStats', 'FillFromCompTableBackup'
-    ];
-
-    const endTasks = [
-        'UpdateTable', 'UpdateMultiGroupLeagueStats', 'UpdateLeagueStats'
-    ];
-
-    // Create Start Tasks section
-    const startSection = createTaskSection('Start Tasks', startTasks, tasksData.filter(task => startTasks.includes(task.description)));
-    div.appendChild(startSection);
-
-    // Create End Tasks section
-    const endSection = createTaskSection('End Tasks', endTasks, tasksData.filter(task => endTasks.includes(task.description)));
-    div.appendChild(endSection);
-
-    return div;
-}
-
 function createTaskSection(title, taskOptions, tasks) {
     const sectionDiv = document.createElement('div');
     sectionDiv.classList.add('task-section');
@@ -144,7 +46,7 @@ function createTaskSection(title, taskOptions, tasks) {
         param1Input.addEventListener('change', () => {
             if (!param1Input.value) {
                 // If param1 is deleted (empty), remove the row and the underlying data
-                deleteTaskData(task.id); // Delete the task data
+                deleteTaskData(task.id, task.description, task.when, task.param1, task.param2, task.param3, task.param4); // Delete the task data
                 taskContainer.remove(); // Remove the task container from the UI
             } else {
                 updateTaskData(task, 'param1', param1Input.value);
@@ -344,55 +246,6 @@ function updateTaskDataForHiddenFields(task) {
     }
 }
 
-function handleParam1Change(id, value) {
-    if (value === '') {
-        // If param1 is deleted (empty), remove the row and delete the data entry
-        deleteTaskData(id);
-        const row = document.querySelector(`tr[data-id='${id}']`);
-        if (row) {
-            row.remove();
-        }
-    } else {
-        updateTaskData(id, 'param1', value);
-    }
-}
-
-function createTaskRow(entry) {
-    const row = document.createElement('tr');
-    row.dataset.id = entry.id; // Set data-id attribute
-
-    const createCellWithInput = (type, value, key) => {
-        const cell = document.createElement('td');
-        const input = document.createElement('input');
-        input.type = type;
-        input.value = value;
-        input.classList.add('tablevalue-input');
-        input.dataset.key = key;
-        input.dataset.context = 'tasks';
-        cell.appendChild(input);
-        return { cell, input };
-    };
-
-    // Create the input for param1
-    const { cell: param1Cell, input: param1Input } = createCellWithInput('text', entry.param1, 'param1');
-
-    // Event listener for param1 change
-    param1Input.addEventListener('change', function () {
-        handleParam1Change(entry.id, param1Input.value);
-    });
-
-    // Create additional inputs for param2, param3, etc.
-    const { cell: param2Cell, input: param2Input } = createCellWithInput('text', entry.param2, 'param2');
-    const { cell: param3Cell, input: param3Input } = createCellWithInput('text', entry.param3, 'param3');
-
-    // Append cells to the row
-    row.appendChild(param1Cell);
-    row.appendChild(param2Cell);
-    row.appendChild(param3Cell);
-
-    return row;
-}
-
 function updateTaskData(id, key, value) {
     // Find the relevant task entry
     let entry = data['tasks'].find(item => item.id == id);
@@ -404,15 +257,138 @@ function updateTaskData(id, key, value) {
     }
 }
 
-function deleteTaskData(id) {
-    // Find the index of the relevant task entry
-    const index = data['tasks'].findIndex(item => item.id == id);
+function createNewTaskData(id, type) {
+    let expanded = getExpandedState();
+    
+    const newTask = {
+        when: "start",
+        id: id,
+        description: 'FillWithTeam',
+        param1: 0,
+        param2: 0,
+        param3: 0,
+        param4: 0
+    };
+
+    if(type=='end'){
+        newTask.when='end';
+        newTask.description="UpdateTable";
+    }
+
+    data['tasks'].push(newTask);
+    organizeCompetitions(data); // Assuming tasks are organized similarly
+    createMessage('New task data created successfully', 'success');
+    
+    buildwindow3(id);
+    restoreExpandedState(expanded);
+}
+
+function createTasksDiv(id) {
+    const div = document.createElement('div');
+    div.id = 'tasks';
+    div.classList.add('standard-div');
+
+    const header = document.createElement('h2');
+    header.textContent = `Tasks`;
+    div.appendChild(header);
+
+    const tasksData = getDataForId('tasks', id);
+
+    // Define start and end tasks
+    const startTasks = [
+        'FillWithTeam', 'FillFromCompTable', 'FillChampionsCupSeeded',
+        'FillFromSpecialTeamsWithNation', 'FillFromLeagueMaxFromCountry',
+        'FillFromLeagueMaxFromCountryShadowed', 'FillFromCompTablePosBackupSameLeague',
+        'FillFromCompTableBackupLeague', 'FillFromLeagueInOrder', 'FillFromLeague',
+        'ClearLeagueStats', 'FillFromCompTableBackup'
+    ];
+
+    const endTasks = [
+        'UpdateTable', 'UpdateMultiGroupLeagueStats', 'UpdateLeagueStats'
+    ];
+
+    // Create Start Tasks section
+    const startSection = document.createElement('div');
+    startSection.classList.add('task-section');
+
+    const startTasksTable = createTaskSection('Start Tasks', startTasks, tasksData.filter(task => startTasks.includes(task.description)));
+    startSection.appendChild(startTasksTable);
+
+    const createStartTaskButton = document.createElement('button');
+    createStartTaskButton.textContent = 'Create Start Task';
+    createStartTaskButton.addEventListener('click', function () {
+        createNewTaskData(id, 'start');
+        refreshTaskSection(id, div, 'start');
+    });
+    startSection.appendChild(createStartTaskButton);
+
+    div.appendChild(startSection);
+
+    // Create End Tasks section
+    const endSection = document.createElement('div');
+    endSection.classList.add('task-section');
+
+    const endTasksTable = createTaskSection('End Tasks', endTasks, tasksData.filter(task => endTasks.includes(task.description)));
+    endSection.appendChild(endTasksTable);
+
+    const createEndTaskButton = document.createElement('button');
+    createEndTaskButton.textContent = 'Create End Task';
+    createEndTaskButton.addEventListener('click', function () {
+        createNewTaskData(id, 'end');
+        refreshTaskSection(id, div, 'end');
+    });
+    endSection.appendChild(createEndTaskButton);
+
+    div.appendChild(endSection);
+
+    return div;
+}
+
+function deleteTaskData(id, description, when, param1, param2, param3, param4) {
+
+    // Define start and end tasks
+    const startTasks = [
+        'FillWithTeam', 'FillFromCompTable', 'FillChampionsCupSeeded',
+        'FillFromSpecialTeamsWithNation', 'FillFromLeagueMaxFromCountry',
+        'FillFromLeagueMaxFromCountryShadowed', 'FillFromCompTablePosBackupSameLeague',
+        'FillFromCompTableBackupLeague', 'FillFromLeagueInOrder', 'FillFromLeague',
+        'ClearLeagueStats', 'FillFromCompTableBackup'
+    ];
+
+    const endTasks = [
+        'UpdateTable', 'UpdateMultiGroupLeagueStats', 'UpdateLeagueStats'
+    ];
+
+    // Determine if the task is a start or end task based on `when`
+    const relevantTasks = when === 'start' 
+        ? data['tasks'].filter(task => startTasks.includes(task.description))
+        : data['tasks'].filter(task => endTasks.includes(task.description));
+
+    // Find the index of the specific task that matches the `id`, `description`, and `when`
+    const index = relevantTasks.findIndex(task => 
+        task.id == id && 
+        task.description === description &&
+        task.param1 == param1 &&
+        task.param2 == param2 &&
+        task.param3 == param3 &&
+        task.param4 == param4
+    );
 
     if (index !== -1) {
-        // Remove the entry from the array
-        data['tasks'].splice(index, 1);
-        console.log(`Task entry with id ${id} has been deleted.`);
+        // Since we filtered relevant tasks, we need to get the actual index in the data['tasks']
+        const actualIndex = data['tasks'].indexOf(relevantTasks[index]);
+
+        if (actualIndex !== -1) {
+            // Remove the entry from the main tasks array
+            data['tasks'].splice(actualIndex, 1);
+
+            // Refresh the UI to reflect the deletion
+            const tasksDiv = createTasksDiv(id);
+            document.getElementById('tasks').replaceWith(tasksDiv);
+        } else {
+            console.error(`Task entry not found in main task list for id ${id} with the specified criteria.`);
+        }
     } else {
-        console.error(`Task entry not found for id ${id}`);
+        console.error(`Task entry not found in relevant tasks for id ${id} with the specified criteria.`);
     }
 }
