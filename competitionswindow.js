@@ -100,7 +100,7 @@ function createCompetitionsListDiv(parentId) {
             // Event listener for Enter key to add the competition
             inputright.addEventListener('keydown', function(event) {
                 if (event.key === 'Enter' && inputright.value.trim() !== '') {
-                    createNewCompObj(parentId, inputright.value.trim(), 2);
+                    createNewCompObj(parentId, inputright.value.trim(), 3);
                     inputright.value = ''; // Clear input after adding
                 }
             });
