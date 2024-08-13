@@ -72,3 +72,53 @@ function getDataForId(type, id) {
 
     return data[type].filter(entry => entry[key] === id);
 }
+
+function findLastCompOfLvl(lvl, parent){
+
+    let lastCompOfLevel = -1;
+    data['compobj'].forEach(comp => {
+        if (comp.level === lvl && comp.parent==parent) {
+            lastCompOfLevel = comp.line;
+        }
+    });
+
+    return lastCompOfLevel;
+}
+
+function findInsertionPoint(startLine, stopLevel) {
+
+    for (let i = 0; i < data['compobj'].length; i++) {
+        const comp = data['compobj'][i];
+        
+        if (comp.line > startLine && (comp.level <= stopLevel || comp.level==6 )) {
+            return comp.line;
+        }
+    }
+
+    return findLastValidLine(); 
+}
+
+function findIntlInsertionPoint(startLine){
+    for (let i = 0; i < data['compobj'].length; i++) {
+        const comp = data['compobj'][i];
+        
+        if (comp.line > startLine && comp.level ==3) {
+            
+            return comp.line;
+        }
+    }
+
+    return findLastValidLine(); 
+}
+
+function findLastValidLine() {
+    let lastValidLine = -1;
+
+    data['compobj'].forEach(comp => {
+        if (comp.line !== null) {
+            lastValidLine = comp.line;
+        }
+    });
+
+    return lastValidLine;
+}

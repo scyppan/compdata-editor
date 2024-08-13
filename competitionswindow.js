@@ -31,7 +31,6 @@ function createCompetitionsListDiv(parentId) {
     const children = getChildren(parentId);
 
     children.forEach(child => {
-        console.log(level, child.level, child);
         
         const li = createCompetitionDivElement(child);
         if(level==0&&child.level==1){
@@ -70,7 +69,7 @@ function createCompetitionsListDiv(parentId) {
     // Event listener for Enter key to add the competition
     inputleft.addEventListener('keydown', function(event) {
         if (event.key === 'Enter' && inputleft.value.trim() !== '') {
-            createNewCompObj(parentId, inputleft.value.trim(), level+1);
+            createNewCompObj(parentId, inputleft.value.trim(), level+1, leftList);
             inputleft.value = ''; // Clear input after adding
         }
     });
@@ -84,7 +83,7 @@ function createCompetitionsListDiv(parentId) {
             // Event listener for Enter key to add the competition
             inputright.addEventListener('keydown', function(event) {
             if (event.key === 'Enter' && inputright.value.trim() !== '') {
-                createNewCompObj(parentId, inputright.value.trim(), 3);
+                createNewCompObj(parentId, inputright.value.trim(), 3, rightList);
                 inputright.value = ''; // Clear input after adding
             }
             });
@@ -100,7 +99,7 @@ function createCompetitionsListDiv(parentId) {
             // Event listener for Enter key to add the competition
             inputright.addEventListener('keydown', function(event) {
                 if (event.key === 'Enter' && inputright.value.trim() !== '') {
-                    createNewCompObj(parentId, inputright.value.trim(), 3);
+                    createNewCompObj(parentId, inputright.value.trim(), 3, rightList);
                     inputright.value = ''; // Clear input after adding
                 }
             });

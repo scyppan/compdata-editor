@@ -114,37 +114,69 @@ function updateCompObj(removedObj, amt) {
     });
 }
 
-function createNewCompObj(parentId, compName, level) {
+function createNewCompObj(parentId, compName, level, listElement) {
     const expandedState = getExpandedState();
+    let insertionPoint = -1;
     
-    let lastChildLine = parentId;
-    data['compobj'].forEach(comp => {
-        if (comp.parent === parentId && comp.line > lastChildLine) {
-            lastChildLine = comp.line;
-        }
-    });
-    
-    const newLine = lastChildLine + 1;
+    switch(level){
+        case 1:
+            let lastConfedLine = findLastCompOfLvl(1, 0); // Level 1, parent 0
+            insertionPoint = findIntlInsertionPoint(lastConfedLine);
+        break;
+        case 2:
+            let lastNatLine = findLastCompOfLvl(2, parentId);
+            insertionPoint = findInsertionPoint(lastNatLine, 2);
+        break;
+        case 3:
+            let lastCompLine = findLastCompOfLvl(3, parentId); 
+            insertionPoint = findInsertionPoint(lastCompLine, 3);
+        break;
+        case 4:
+            let lastStageLine = findLastCompOfLvl(4, parentId); 
+            insertionPoint = findInsertionPoint(lastStageLine, 4);
+        break;
+        case 5:
+            let lastGroupLine = findLastCompOfLvl(5, parentId); 
+            insertionPoint = findInsertionPoint(lastGroupLine, 5);
+        break;
+        default: break;
+    }
 
     const newCompObj = {
-        line: newLine,
+        line: insertionPoint,
         level: level,
         shortname: compName,
         longname: compName,
         parent: parentId
     };
 
-    data['compobj'].splice(newLine, 0, newCompObj); // Add new compobj to the list in order
-    updateCompObj(newCompObj, 1); // Update references with +1
-    updateAllReferences(newLine, 1); // Update all related references
+    // Push subsequent elements down by 1 to make space
+    pushSubsequentCompObjs(insertionPoint);
 
-    // Update UI: Append the new competition object to the UI under the correct parent
-    const parentElement = document.querySelector(`[data-compid="${parentId}"] ul`);
-    if (parentElement) {
+    // Insert at the exact insertion point without subtracting 1
+    data['compobj'].splice(insertionPoint, 0, newCompObj);
+
+    updateAllReferences(insertionPoint, 1);
+
+     if(listElement){
         const newCompElement = createCompetitionDivElement(newCompObj);
-        parentElement.appendChild(newCompElement);
-    }
+        listElement.appendChild(newCompElement);
+     }
+    
+    organizeCompetitions(data);
+    restoreExpandedState(expandedState); 
+}
 
-    organizeCompetitions(data); // Reorganize competitions in the left panel
-    restoreExpandedState(expandedState); // Restore expanded state to keep UI consistent
+
+function pushSubsequentCompObjs(startPoint){
+    data['compobj'].forEach(obj=>{
+        if(obj.line>=startPoint){
+            obj.line++;
+            
+        }
+
+        if(obj.parent>=startPoint){
+            obj.parent++;
+        }
+    });
 }
