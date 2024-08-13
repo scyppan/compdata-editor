@@ -46,17 +46,6 @@ function buildwindow0() {
 
     const weatherDiv = createWeatherDiv(0);
 
-    // Create the button
-    const button = document.createElement('button');
-    button.textContent = "Create New International Competition";
-    button.classList.add('create-button'); // Add any classes you need for styling
-    button.style.marginTop = '12px'; // Correctly set margin-top using style property
-
-    // Add event listener for the button
-    button.addEventListener('click', function() {
-        createNewInternationalCompetition();
-    });
-
     // Clear any existing content and append the header, settings div, competitions list, and button
     const contentElement = document.getElementById('level-0-content');
     contentElement.innerHTML = ''; // Clear existing content
@@ -66,7 +55,6 @@ function buildwindow0() {
     left.appendChild(competitionsListDiv);
     left.appendChild(weatherDiv);
     right.appendChild(settingsDiv);
-    contentElement.appendChild(button);
     
 }
 
@@ -88,17 +76,6 @@ function buildwindow1(id) {
     // Create the weather div 
     const weatherDiv = createWeatherDiv(id);
 
-    // Create the button
-    const button = document.createElement('button');
-    button.textContent = "Create New International Competition";
-    button.classList.add('create-button'); // Add any classes you need for styling
-    button.style.marginTop = '12px'; // Correctly set margin-top using style property
-
-    // Add event listener for the button
-    button.addEventListener('click', function() {
-        createNewInternationalCompetition();
-    });
-
     // Clear any existing content and append the header, settings div, competitions list, and button
     const contentElement = document.getElementById('level-1-content');
     contentElement.innerHTML = ''; // Clear existing content
@@ -108,7 +85,6 @@ function buildwindow1(id) {
     left.appendChild(competitionsListDiv);
     right.appendChild(settingsDiv);
     left.appendChild(weatherDiv);
-    contentElement.appendChild(button);
 
 }
 

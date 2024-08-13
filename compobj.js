@@ -21,69 +21,13 @@ function updateAllReferences(newLine, amt) {
     updateWeatherReferences(newLine, amt);
 }
 
-function updateAdvancementReferences(newLine) {
-    data['advancement'].forEach(entry => {
-        // If the groupid references a line number greater than or equal to newLine, increment it
-        if (entry.groupid >= newLine) {
-            entry.groupid += 1;
-        }
-    
-        // If the pushtocompetition references a line number greater than or equal to newLine, increment it
-        if (entry.pushtocompetition >= newLine) {
-            entry.pushtocompetition += 1;
-        }
-    });
-}
-
-function updateObjectivesReferences(newLine) {
-    data['objectives'].forEach(entry => {
-        // If the id references a line number greater than or equal to newLine, increment it
-        if (entry.id >= newLine) {
-            entry.id += 1;
-        }
-    });
-}
-
-function updateScheduleReferences(newLine) {
-    data['schedule'].forEach(entry => {
-        // If the id references a line number greater than or equal to newLine, increment it
-        if (entry.id >= newLine) {
-            entry.id += 1;
-        }
-    });
-}
-
-function updateSettingsReferences(newLine) {
-    data['settings'].forEach(entry => {
-        // If the id references a line number greater than or equal to newLine, increment it
-        if (entry.id >= newLine) {
-            entry.id += 1;
-        }
-    });
-}
-
-function updateStandingsReferences(newLine) {
-    data['standings'].forEach(entry => {
-        // If the id references a line number greater than or equal to newLine, increment it
-        if (entry.id >= newLine) {
-            entry.id += 1;
-        }
-    });
-}
-
-function updateWeatherReferences(newLine) {
-    data['weather'].forEach(entry => {
-        // Update id references in the weather dataset
-        if (entry.id >= newLine) {
-            entry.id += 1;
-        }
-    });
-}
-
 function updateTaskReferences(newLine, amt) {
     data['tasks'].forEach(task => {
 
-        task.id+=amt;
+        if(task.id>=newLine){
+            task.id+=amt;
+        }
+        
 
         if(task.description=='UpdateTable'||task.description=='FillFromCompTableBackup'||task.description=='FillFromCompTablePosBackupSameLeague'||task.description=='FillFromCompTableBackupLeague'){
             if (task.param1 >= newLine) task.param1 += amt;
@@ -168,4 +112,39 @@ function updateCompObj(removedObj, amt) {
             obj.line += amt;
         }
     });
+}
+
+function createNewCompObj(parentId, compName, level) {
+    const expandedState = getExpandedState();
+    
+    let lastChildLine = parentId;
+    data['compobj'].forEach(comp => {
+        if (comp.parent === parentId && comp.line > lastChildLine) {
+            lastChildLine = comp.line;
+        }
+    });
+    
+    const newLine = lastChildLine + 1;
+
+    const newCompObj = {
+        line: newLine,
+        level: level,
+        shortname: compName,
+        longname: compName,
+        parent: parentId
+    };
+
+    data['compobj'].splice(newLine, 0, newCompObj); // Add new compobj to the list in order
+    updateCompObj(newCompObj, 1); // Update references with +1
+    updateAllReferences(newLine, 1); // Update all related references
+
+    // Update UI: Append the new competition object to the UI under the correct parent
+    const parentElement = document.querySelector(`[data-compid="${parentId}"] ul`);
+    if (parentElement) {
+        const newCompElement = createCompetitionDivElement(newCompObj);
+        parentElement.appendChild(newCompElement);
+    }
+
+    organizeCompetitions(data); // Reorganize competitions in the left panel
+    restoreExpandedState(expandedState); // Restore expanded state to keep UI consistent
 }

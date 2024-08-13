@@ -484,6 +484,23 @@ input[type="file"] {
     display: none;
 }
 
+.competition-div{
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    height: 50%;
+}
+
 .competition-item:hover .delete-button {
     display: inline;
+}
+
+.confederations-container {
+    width: 48%; /* Adjust as necessary */
+    
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
 }

@@ -7,6 +7,18 @@ function createWeatherDiv(id) {
     header.textContent = 'Weather';
     div.appendChild(header);
 
+    // Get the weather data for the specified id
+    const weatherData = getDataForId('weather', id);
+
+    if (!weatherData || weatherData.length === 0) {
+        // If there is no weather data, display a message instead of the table
+        const noDataMessage = document.createElement('p');
+        noDataMessage.textContent = 'No weather data';
+        noDataMessage.style.fontSize = "12px";
+        div.appendChild(noDataMessage);
+        return div;
+    }
+
     // Create a table for the weather data
     const table = document.createElement('table');
     table.classList.add('window-tables');
@@ -27,7 +39,6 @@ function createWeatherDiv(id) {
     const tbody = document.createElement('tbody');
     
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const weatherData = getDataForId('weather', id);
 
     for (let i = 0; i < 12; i++) {
         const month = i + 1;
@@ -81,7 +92,6 @@ function createWeatherDiv(id) {
 
     return div;
 }
-
 
 function updateWeatherData(id, key, value) {
     // Find the relevant weather entry

@@ -4,22 +4,139 @@ function getChildren(parentId) {
 
 function createCompetitionsListDiv(parentId) {
     const div = document.createElement('div');
-    div.id = `Children`;
-    div.classList.add('standard-div');
+    div.classList.add('level-content', 'standard-div');
 
-    const header = document.createElement('h2');
-    header.textContent = `Children`;
-    div.appendChild(header);
+    const parentObj = data['compobj'].find(comp => comp.line === parentId);
+    let level = parentObj ? parentObj.level : 0;
 
+    const leftDiv = document.createElement('div');
+    const rightDiv = document.createElement('div');
+    leftDiv.classList.add('confederations-container');
+    rightDiv.classList.add('confederations-container');
+    leftDiv.id=="leftcompdiv";
+    rightDiv.id=="rightcompdiv";
+
+    const leftHeader = document.createElement('h2');
+    const rightHeader = document.createElement('h2');
+
+    leftDiv.appendChild(leftHeader);
+    rightDiv.appendChild(rightHeader);
+
+    const leftList = document.createElement('ul');
+    const rightList = document.createElement('ul');
+    leftDiv.appendChild(leftList);
+    rightDiv.appendChild(rightList);
+
+    // Separate children based on their levels
     const children = getChildren(parentId);
-    const ul = document.createElement('ul');
 
     children.forEach(child => {
+        console.log(level, child.level, child);
+        
         const li = createCompetitionDivElement(child);
-        ul.appendChild(li);
+        if(level==0&&child.level==1){
+            leftList.appendChild(li);
+        }else if(level==0&&child.level==3){
+            rightList.appendChild(li);
+        }else if(level==1&&child.level==2){
+            leftList.appendChild(li);
+        }else if(level==1&&child.level==3){
+            rightList.appendChild(li);
+        }else{
+            leftList.appendChild(li);
+        }
     });
 
-    div.appendChild(ul);
+    div.appendChild(leftDiv);
+
+    const leftAddDiv = document.createElement('div');
+    leftAddDiv.classList.add('add-compobj-container');
+    const inputleft = document.createElement('input');
+    inputleft.type = 'text';
+    inputleft.placeholder = 'Add new confederation...';
+    inputleft.classList.add('add-compobj-input');
+    leftAddDiv.appendChild(inputleft);
+    leftDiv.appendChild(leftAddDiv);
+
+    const rightAddDiv = document.createElement('div');
+    rightAddDiv.classList.add('add-compobj-container');
+    const inputright = document.createElement('input');
+    inputright.type = 'text';
+    inputright.placeholder = 'Add new competition...';
+    inputright.classList.add('add-compobj-input');
+    rightAddDiv.appendChild(inputright);
+    rightDiv.appendChild(rightAddDiv);
+
+    // Event listener for Enter key to add the competition
+    inputleft.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' && inputleft.value.trim() !== '') {
+            createNewCompObj(parentId, inputleft.value.trim(), level+1);
+            inputleft.value = ''; // Clear input after adding
+        }
+    });
+
+    switch(level){
+        case 0: 
+            leftHeader.textContent = 'Confederations';
+            rightHeader.textContent = 'Competitions';
+            div.appendChild(rightDiv);
+
+            // Event listener for Enter key to add the competition
+            inputright.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' && inputright.value.trim() !== '') {
+                createNewCompObj(parentId, inputright.value.trim(), 3);
+                inputright.value = ''; // Clear input after adding
+            }
+            });
+
+            div.classList.remove('standard-div');
+            div.classList.add('competition-div');
+        break;
+        case 1:
+            leftHeader.textContent = 'Nations';
+            rightHeader.textContent = 'Competitions';
+            div.appendChild(rightDiv);
+
+            // Event listener for Enter key to add the competition
+            inputright.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter' && inputright.value.trim() !== '') {
+                    createNewCompObj(parentId, inputright.value.trim(), 2);
+                    inputright.value = ''; // Clear input after adding
+                }
+            });
+
+            inputleft.placeholder = 'Add new nation...';
+
+            div.classList.remove('standard-div');
+            div.classList.add('competition-div');
+        break;
+        case 2:
+            rightDiv.appendChild(rightList); //only append right if level is 0 or 1
+            leftHeader.textContent = 'Competitions';
+            inputleft.placeholder = 'Add new competition...';
+            
+            leftDiv.classList.remove('standard-div');
+            leftDiv.classList.remove('confederations-container');
+            
+        break;
+        case 3:
+            rightDiv.appendChild(rightList); //only append right if level is 0 or 1
+            leftHeader.textContent = 'Stages';
+            inputleft.placeholder = 'Add new stage...';
+            
+            leftDiv.classList.remove('standard-div');
+            leftDiv.classList.remove('confederations-container');
+            
+        break;
+        case 4: 
+            rightDiv.appendChild(rightList); //only append right if level is 0 or 1
+            leftHeader.textContent = 'Groups';
+            inputleft.placeholder = 'Add new group...';
+            
+            leftDiv.classList.remove('standard-div');
+            leftDiv.classList.remove('confederations-container');
+        break;
+    }
 
     return div;
 }

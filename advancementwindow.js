@@ -99,7 +99,6 @@ function createAdvancementDiv(id) {
     return div;
 }
 
-
 function updateAdvancementData(id, slot, key, value) {
     let parsedValue = parseInt(value, 10);
 
