@@ -223,46 +223,6 @@ function updateCompObjName(compId, newName) {
     }
 }
 
-function removeCompObj(compObj, elementToRemove) {
-    // Find the index of the group to remove
-    const compObjIndex = data['compobj'].findIndex(obj => obj.line === compObj);
-    if (compObjIndex === -1) return; // Group not found, do nothing
-
-    const removedGroup = data['compobj'][compObjIndex];
-    const removedLevel = removedGroup.level;
-
-    // Remove the original group
-    data['compobj'].splice(compObjIndex, 1);
-    let removalCount = 1; // Start with 1 for the original group
-
-    // Use a regular for loop to go through subsequent elements
-    for (let i = compObjIndex; i < data['compobj'].length; i++) {
-        const obj = data['compobj'][i];
-
-        if (obj.level > removedLevel) {
-            // Remove the group if it has a higher level
-            data['compobj'].splice(i, 1);
-            i--; // Adjust the index after removal
-            removalCount++;
-        } else {
-            // Stop removing if the level is the same or lower
-            break;
-        }
-    }
-
-    // Update all references by the number of removed objects
-    updateCompObj(removedGroup, -removalCount); 
-    updateAllReferences(removedGroup.line, -removalCount);
-
-    // Remove the element from the DOM
-    elementToRemove.remove();
-
-    // Optionally, update the UI (e.g., refresh the list or state)
-    let expandedState = getExpandedState();
-    organizeCompetitions(data);
-    restoreExpandedState(expandedState);
-}
-
 function getRemovalCount(){
     let i = groupIndex + 1;
     let removalCount = 0;

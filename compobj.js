@@ -167,7 +167,6 @@ function createNewCompObj(parentId, compName, level, listElement) {
     restoreExpandedState(expandedState); 
 }
 
-
 function pushSubsequentCompObjs(startPoint){
     data['compobj'].forEach(obj=>{
         if(obj.line>=startPoint){
@@ -179,4 +178,40 @@ function pushSubsequentCompObjs(startPoint){
             obj.parent++;
         }
     });
+}
+
+function removeCompObj(id, elementToRemove) {
+    
+    const firstDeletionPoint = data['compobj'].findIndex(obj => obj.line === id);
+    if (firstDeletionPoint === -1) return; // Object not found, do nothing
+
+    let compobj = data['compobj'][firstDeletionPoint];
+    let lastDeletionPoint = findLastCompInHierarchy(id, compobj.level);
+
+    let deletionCount = (lastDeletionPoint !== -1) ? lastDeletionPoint - firstDeletionPoint + 1 : 1;
+    console.log(deletionCount);
+
+    data['compobj'].forEach(comp => {
+        if (comp.id >= id) {
+            // Reduce the parent if it is greater than or equal to the deleted id
+            comp.parent -= deletionCount;
+    
+            // Reduce the id value itself to reflect the shift caused by deletion
+            comp.id -= deletionCount;
+        }
+    });
+    
+    // Perform the deletion
+    data['compobj'].splice(firstDeletionPoint, deletionCount);
+
+
+    updateAllReferences(id, -deletionCount);
+
+    // Remove the element from the DOM
+    elementToRemove.remove();
+
+    // Optionally, update the UI (e.g., refresh the list or state)
+    let expandedState = getExpandedState();
+    organizeCompetitions(data);
+    restoreExpandedState(expandedState);
 }
