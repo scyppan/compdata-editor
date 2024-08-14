@@ -53,63 +53,43 @@ function createSettingsDiv(competitionid) {
     div.appendChild(header);
 
     // Fetch settings for the specified competitionid
-    const settings = getDataForId('settings', competitionid);
+    const settingsData = getDataForId('settings', competitionid);
 
     const table = document.createElement('table');
     table.classList.add('window-tables');
     const tbody = document.createElement('tbody');
-
-    settings.forEach(setting => {
-        const row = document.createElement('tr');
-        row.dataset.id = setting.id; // Set data-id attribute
-        row.dataset.tag = setting.tag; // Set data-tag attribute
-
-        const tagCell = document.createElement('td');
-        const valueCell = document.createElement('td');
-        valueCell.classList.add('tablevalue');
-    
-        const select = document.createElement('select');
-        select.classList.add('settingsselect');
-        select.dataset.key = 'tag'; // Ensure this is set for duplicate checking
-    
-        // Populate the select options
-        options.forEach(option => {
-            const optionElement = document.createElement('option');
-            optionElement.value = option;
-            optionElement.textContent = option;
-            if (option === setting.tag) optionElement.selected = true;
-            select.appendChild(optionElement);
-        });
-    
-        const input = document.createElement('input');
-        input.type = textTags.includes(setting.tag) ? 'text' : 'number';
-        input.value = setting.value !== null ? setting.value : (input.type === 'text' ? '' : 0);
-        input.min = input.type === 'number' ? -1 : undefined;
-        input.classList.add('tablevalue-input');
-    
-        // Event listener for tag change
-        select.addEventListener('change', function () {
-            handleSettingTagChange(setting.id, setting.tag, select.value, select, input);
-            setting.tag = select.value;  // Update the local variable to reflect the change
-        });
-
-        // Event listener for value change
-        input.addEventListener('change', function () {
-            handleSettingValueChange(setting.id, setting.tag, input.value);
-        });
-    
-        tagCell.appendChild(select);
-        valueCell.appendChild(input);
-        row.appendChild(tagCell);
-        row.appendChild(valueCell);
-        tbody.appendChild(row);
-    });
-
     table.appendChild(tbody);
     div.appendChild(table);
 
+    settingsData.forEach(setting => {
+        addSettingRow(setting, tbody);
+    });
+
+    // Check if there are any unused options left before adding the "Create New Setting" button
+    const usedTags = settingsData.map(setting => setting.tag);
+    const availableOptions = options.filter(option => !usedTags.includes(option));
+
+    if (availableOptions.length > 0) {
+        // Create button for adding new settings
+        const createButton = document.createElement('button');
+        createButton.textContent = 'Create New Setting';
+        createButton.addEventListener('click', function () {
+            const randomIndex = Math.floor(Math.random() * availableOptions.length);
+            const selectedOption = availableOptions.splice(randomIndex, 1)[0]; // Pick a random unselected option
+            let newSetting = createNewSettingData(competitionid, selectedOption);
+            addSettingRow(newSetting, tbody);
+
+            // Disable the button if all options are used up
+            if (availableOptions.length === 0) {
+                createButton.disabled = true;
+            }
+        });
+        div.appendChild(createButton);
+    }
+
     return div;
 }
+
 
 function handleSettingValueChange(id, tag, value){
     if (value === '') {
@@ -129,7 +109,6 @@ function handleSettingValueChange(id, tag, value){
     }
 }
 
-
 function handleSettingTagChange(id, oldtag, newtag, select, input) {
     // Check for duplicate tags before proceeding
     if (!preventDupSetting(id, oldtag, newtag, select)) {
@@ -141,36 +120,35 @@ function handleSettingTagChange(id, oldtag, newtag, select, input) {
     if (setting) {
         setting.tag = newtag;
 
-        // Check if the new tag requires a different input type
-        const oldtagrequirestext = textTags.includes(oldtag);
-        const newtagrequirestext = textTags.includes(newtag);
-
-        if(oldtagrequirestext&&!newtagrequirestext){
-            input.type = 'number';
-            input.value = 0;  // Reset the input value if needed
-            input.min = -1;    // Adjust the min value if applicable
-        }
-
-        if(!oldtagrequirestext&&newtagrequirestext){
-            input.type = 'text';
-            input.value = '';  // Reset the input value if needed
-        }
+        // Adjust input type if the new tag requires a different type
+        const requiresText = textTags.includes(newtag);
+        input.type = requiresText ? 'text' : 'number';
+        input.value = requiresText ? '' : 0;
     } else {
-        createMessage(`Setting not found for ID: ${id} and tag: ${oldtag}`, 'error');
+        console.error(`Setting not found for ID: ${id} and tag: ${oldtag}`);
+    }
+}
+
+function handleSettingValueChange(id, tag, value) {
+    // Find the relevant setting
+    let setting = data['settings'].find(line => line.id == id && line.tag == tag);
+    if (setting) {
+        setting.value = textTags.includes(tag) ? value : parseInt(value, 10);
+    } else {
+        console.error(`Setting not found for ID: ${id} and tag: ${tag}`);
     }
 }
 
 function preventDupSetting(id, oldtag, newtag, select) {
-    
     const isDuplicate = data['settings'].some(line => line.id == id && line.tag === newtag);
 
     if (isDuplicate) {
-        createMessage("Duplicate setting tag", "error"); // Show error message
+        createMessage("Duplicate setting tag", 'error'); // Show error message
         select.value = oldtag;
-        return false; // Indicate that the script should not continue
+        return false; // Prevent further action
     }
 
-    return true; // No duplicates found
+    return true;
 }
 
 function deleteSetting(id, tag) {
@@ -182,3 +160,88 @@ function deleteSetting(id, tag) {
         console.error(`Setting not found for ID: ${id} and tag: ${tag}`);
     }
 }
+
+function preventDupSetting(id, oldtag, newtag, select) {
+    const isDuplicate = data['settings'].some(line => line.id == id && line.tag === newtag);
+
+    if (isDuplicate) {
+        createMessage("Duplicate setting tag", 'error'); // Show error message
+        select.value = oldtag;
+        return false; // Prevent further action
+    }
+
+    return true;
+}
+
+function deleteSetting(id, tag) {
+    const index = data['settings'].findIndex(line => line.id == id && line.tag == tag);
+    if (index !== -1) {
+        data['settings'].splice(index, 1);
+        console.log(`Setting with ID: ${id} and tag: ${tag} has been deleted.`);
+    } else {
+        console.error(`Setting not found for ID: ${id} and tag: ${tag}`);
+    }
+}
+
+function createNewSettingData(competitionid, defaultTag) {
+    // Create the new setting entry with a provided default tag and value
+    let newSetting = {
+        id: competitionid,
+        tag: defaultTag, // Use the provided default option
+        value: textTags.includes(defaultTag) ? '' : 0 // Default to empty string or 0 depending on type
+    };
+
+    // Add the new setting to the data array
+    data['settings'].push(newSetting);
+    data['settings'].sort((a, b) => a.id - b.id);
+
+
+    return newSetting;
+}
+
+function addSettingRow(setting, tbody) {
+    const row = document.createElement('tr');
+    row.dataset.id = setting.id; // Set data-id attribute
+    row.dataset.tag = setting.tag; // Set data-tag attribute
+
+    const tagCell = document.createElement('td');
+    const valueCell = document.createElement('td');
+    valueCell.classList.add('tablevalue');
+
+    const select = document.createElement('select');
+    select.classList.add('settingsselect');
+    select.dataset.key = 'tag'; // Ensure this is set for duplicate checking
+
+    // Populate the select options
+    options.forEach(option => {
+        const optionElement = document.createElement('option');
+        optionElement.value = option;
+        optionElement.textContent = option;
+        if (option === setting.tag) optionElement.selected = true;
+        select.appendChild(optionElement);
+    });
+
+    const input = document.createElement('input');
+    input.type = textTags.includes(setting.tag) ? 'text' : 'number';
+    input.value = setting.value !== null ? setting.value : (input.type === 'text' ? '' : 0);
+    input.min = input.type === 'number' ? -1 : undefined;
+    input.classList.add('tablevalue-input');
+
+    // Event listener for tag change
+    select.addEventListener('change', function () {
+        handleSettingTagChange(setting.id, setting.tag, select.value, select, input);
+        setting.tag = select.value;  // Update the local variable to reflect the change
+    });
+
+    // Event listener for value change
+    input.addEventListener('change', function () {
+        handleSettingValueChange(setting.id, setting.tag, input.value);
+    });
+
+    tagCell.appendChild(select);
+    valueCell.appendChild(input);
+    row.appendChild(tagCell);
+    row.appendChild(valueCell);
+    tbody.appendChild(row);
+}
+
