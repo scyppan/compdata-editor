@@ -142,25 +142,23 @@ function addAdvancementRow(entry, tbody) {
         if (!slotInput.value || isNaN(slotInput.value)) {
             // If slot is removed or invalid, remove the row and update data
             row.remove(); // Remove the row from the table
-            updateAdvancementData(entry.groupid, entry.slot, 'slot', ''); // Clear data
+            updateAdvancementData(entry.groupid, entry.slot, entry.pushtocompetition, entry.pushtoposition, 'slot', ''); // Clear data
         } else {
-            updateAdvancementData(entry.groupid, entry.slot, 'slot', slotInput.value);
+            updateAdvancementData(entry.groupid, entry.slot, entry.pushtocompetition, entry.pushtoposition, 'slot', slotInput.value);
             entry.slot = slotInput.value;  // Update the local variable to reflect the change
         }
     });
-
-    // Event listener for push competition change
+    
     pushCompInput.addEventListener('change', function () {
-        updateAdvancementData(entry.groupid, entry.slot, 'pushtocompetition', pushCompInput.value);
+        updateAdvancementData(entry.groupid, entry.slot, entry.pushtocompetition, entry.pushtoposition, 'pushtocompetition', pushCompInput.value);
         entry.pushtocompetition = pushCompInput.value;  // Update the local variable to reflect the change
     });
-
-    // Event listener for push position change
+    
     pushPosInput.addEventListener('change', function () {
-        updateAdvancementData(entry.groupid, entry.slot, 'pushtoposition', pushPosInput.value);
+        updateAdvancementData(entry.groupid, entry.slot, entry.pushtocompetition, entry.pushtoposition, 'pushtoposition', pushPosInput.value);
         entry.pushtoposition = pushPosInput.value;  // Update the local variable to reflect the change
     });
-
+    
     row.appendChild(slotCell);
     row.appendChild(pushCompCell);
     row.appendChild(pushPosCell);
@@ -168,11 +166,16 @@ function addAdvancementRow(entry, tbody) {
     tbody.appendChild(row); // Add the new row to the table body
 }
 
-function updateAdvancementData(id, slot, key, value) {
+function updateAdvancementData(id, slot, pushtocompetition, pushtoposition, key, value) {
     let parsedValue = parseInt(value, 10);
 
-    // Find the relevant advancement entry
-    let entry = data['advancement'].find(item => item.groupid == id && item.slot == parseInt(slot, 10));
+    // Find the relevant advancement entry by matching all parameters
+    let entry = data['advancement'].find(item => 
+        item.groupid == id &&
+        item.slot == parseInt(slot, 10) &&
+        item.pushtocompetition == pushtocompetition &&
+        item.pushtoposition == pushtoposition
+    );
 
     if (!parsedValue) {
         // If slot value is invalid (e.g., cleared), remove the entry and the row
