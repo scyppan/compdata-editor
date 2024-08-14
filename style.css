@@ -504,3 +504,25 @@ ul {
     list-style-type: none;
     padding: 0;
 }
+
+.round-control, .entry-control {
+    display: inline-block;
+    margin-left: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.round-controls {
+    display: inline-block;
+    margin-left: 10px;
+}
+
+.round-control:hover, .entry-control:hover {
+    color: #7c7c5a;
+    font-weight:bold;
+}
+
+.round-control:active, .entry-control:active {
+    color: #7c7c5a;
+}
