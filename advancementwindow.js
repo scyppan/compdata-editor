@@ -7,21 +7,6 @@ function createAdvancementDiv(id) {
     header.textContent = `Advancement`;
     div.appendChild(header);
 
-    // Get advancement data for the specified id
-    const advancementData = getDataForId('advancement', id);
-
-    // Check for empty advancement data
-    if (advancementData.length === 0) {
-        const advancementParagraph = document.createElement('p');
-        advancementParagraph.textContent = 'No advancement data';
-        advancementParagraph.style.fontSize = "12px";
-        div.appendChild(advancementParagraph); // Append the message to the main div
-        return div; // Return early if there is no advancement data
-    }
-
-    // Sort the advancement data by slot
-    advancementData.sort((a, b) => a.slot - b.slot);
-
     // Create table to display advancement data
     const table = document.createElement('table');
     table.classList.add('window-tables');
@@ -38,96 +23,61 @@ function createAdvancementDiv(id) {
     table.appendChild(thead);
 
     const tbody = document.createElement('tbody');
-
-    advancementData.forEach(entry => {
-        const row = document.createElement('tr');
-        row.dataset.id = entry.groupid; // Set data-id attribute
-        row.dataset.slot = entry.slot; // Set data-slot attribute
-        row.dataset.type = 'advancement'; // Set data-type attribute
-    
-        const createCellWithInput = (value, key) => {
-            const cell = document.createElement('td');
-            const input = document.createElement('input');
-            input.type = 'number';
-            input.value = value;
-            input.classList.add('tablevalue-input');
-            input.dataset.key = key;
-            input.dataset.context = 'advancement';
-            input.dataset.fieldType = 'standard';
-            cell.appendChild(input);
-            return { cell, input };
-        };
-    
-        const { cell: slotCell, input: slotInput } = createCellWithInput(entry.slot, 'slot');
-        const { cell: pushCompCell, input: pushCompInput } = createCellWithInput(entry.pushtocompetition, 'pushtocompetition');
-        const { cell: pushPosCell, input: pushPosInput } = createCellWithInput(entry.pushtoposition, 'pushtoposition');
-    
-        // Event listener for slot change
-        slotInput.addEventListener('change', function () {
-            if (!slotInput.value || isNaN(slotInput.value)) {
-                // If slot is removed or invalid, remove the row and update data
-                row.remove(); // Remove the row from the table
-                updateAdvancementData(entry.groupid, entry.slot, 'slot', ''); // Clear data
-            } else {
-                updateAdvancementData(entry.groupid, entry.slot, 'slot', slotInput.value);
-                entry.slot = slotInput.value;  // Update the local variable to reflect the change
-            }
-        });
-    
-        // Event listener for push competition change
-        pushCompInput.addEventListener('change', function () {
-            updateAdvancementData(entry.groupid, entry.slot, 'pushtocompetition', pushCompInput.value);
-            entry.pushtocompetition = pushCompInput.value;  // Update the local variable to reflect the change
-        });
-    
-        // Event listener for push position change
-        pushPosInput.addEventListener('change', function () {
-            updateAdvancementData(entry.groupid, entry.slot, 'pushtoposition', pushPosInput.value);
-            entry.pushtoposition = pushPosInput.value;  // Update the local variable to reflect the change
-        });
-    
-        row.appendChild(slotCell);
-        row.appendChild(pushCompCell);
-        row.appendChild(pushPosCell);
-    
-        tbody.appendChild(row);
-    });
-
     table.appendChild(tbody);
-    div.appendChild(table);
 
-    // Add the "Create New Advancement" button after the table
+    // Create button for adding new advancements
     const createButton = document.createElement('button');
     createButton.textContent = 'Create New Advancement';
     createButton.addEventListener('click', function () {
-        createNewAdvancementData(id, advancementData);
+        let newAdv = createNewAdvancementData(id);
+        // Ensure that if it's the first advancement, the table is displayed and the message is removed
+        table.classList.remove('hidden');
+        const noDataMessage = div.querySelector('.no-data-message');
+        if (noDataMessage) {
+            noDataMessage.remove();
+        }
         
+        addAdvancementRow(newAdv, tbody);
     });
 
+    div.appendChild(table);
     div.appendChild(createButton); // Append the button after the table
+
+    // Get advancement data for the specified id
+    const advancementData = getDataForId('advancement', id);
+    advancementData.sort((a, b) => a.slot - b.slot);
+
+    advancementData.forEach(entry => {
+        addAdvancementRow(entry, tbody); // Ensure tbody is passed correctly
+    });    
+
+    // Check for empty advancement data
+    if (advancementData.length === 0) {
+        table.classList.add('hidden'); // Hide the table if there's no data
+        const advancementParagraph = document.createElement('p');
+        advancementParagraph.textContent = 'No advancement data';
+        advancementParagraph.classList.add('no-data-message'); // Add a class for easy targeting later
+        advancementParagraph.style.fontSize = "12px";
+        div.appendChild(advancementParagraph); // Append the message to the main div
+    }
 
     return div;
 }
 
-function createNewAdvancementData(id, advancementData) {
+function createNewAdvancementData(id) {
     // Determine the appropriate slot based on the existing entries
+    
+    const advancementData = getDataForId('advancement', id);
     let newSlot = 0;
+    let firstSlot = 0;
 
-    if (advancementData.length > 0) {
-        // Sort the data to ensure correct slot determination
-        advancementData.sort((a, b) => {
-            if (a.groupid === b.groupid) {
-                return a.slot - b.slot;
-            } else {
-                return a.groupid - b.groupid;
-            }
-        });
-
-        const firstSlot = advancementData[0].slot;
-        
-        if (firstSlot !== 0) {
-            newSlot = Math.max(...advancementData.map(entry => entry.slot)) + 1;
-        }
+    if(advancementData.length!=0){
+        firstSlot = advancementData[0].slot;
+        advancementData.sort((a, b) => a.slot - b.slot);
+    }
+            
+    if (firstSlot !== 0) {
+        newSlot = Math.max(...advancementData.map(entry => entry.slot)) + 1;
     }
 
     // Create the new advancement entry
@@ -138,72 +88,84 @@ function createNewAdvancementData(id, advancementData) {
         pushtoposition: 0
     };
 
-    data['advancement'].push(newAdvancement); // Add to the advancements array
+    data['advancement'].push(newAdvancement);
 
-    // Now add the new row directly to the existing table
-    addAdvancementRow(newAdvancement);
+    // Map the array to include the index, sort it, and then map it back to remove the index
+    data['advancement'] = data['advancement']
+    .map((item, index) => ({ ...item, _index: index })) // Add an _index property
+    .sort((a, b) => {
+        if (!a || !b) {
+            console.error(`Encountered undefined entry at index ${a ? a._index : 'undefined'}, ${b ? b._index : 'undefined'}`, a, b);
+            return 0; // or handle the case as needed
+        }
+        if (a.groupid === b.groupid) {
+            return a.slot - b.slot;
+        } else {
+            return a.groupid - b.groupid;
+        }
+    })
+    .map(({ _index, ...rest }) => rest); // Remove the _index property after sorting
 
-    createMessage('New advancement created successfully', 'success');
+    return newAdvancement;
 }
 
-function addAdvancementRow(entry) {
-    const tableBody = document.querySelector('#advancement tbody'); // Select the table body
-
-    if (tableBody) {
-        const row = document.createElement('tr');
-        row.dataset.id = entry.groupid; // Set data-id attribute
-        row.dataset.slot = entry.slot; // Set data-slot attribute
-        row.dataset.type = 'advancement'; // Set data-type attribute
-
-        const createCellWithInput = (value, key) => {
-            const cell = document.createElement('td');
-            const input = document.createElement('input');
-            input.type = 'number';
-            input.value = value;
-            input.classList.add('tablevalue-input');
-            input.dataset.key = key;
-            input.dataset.context = 'advancement';
-            input.dataset.fieldType = 'standard';
-            cell.appendChild(input);
-            return { cell, input };
-        };
-
-        const { cell: slotCell, input: slotInput } = createCellWithInput(entry.slot, 'slot');
-        const { cell: pushCompCell, input: pushCompInput } = createCellWithInput(entry.pushtocompetition, 'pushtocompetition');
-        const { cell: pushPosCell, input: pushPosInput } = createCellWithInput(entry.pushtoposition, 'pushtoposition');
-
-        // Event listener for slot change
-        slotInput.addEventListener('change', function () {
-            if (!slotInput.value || isNaN(slotInput.value)) {
-                // If slot is removed or invalid, remove the row and update data
-                row.remove(); // Remove the row from the table
-                updateAdvancementData(entry.groupid, entry.slot, 'slot', ''); // Clear data
-            } else {
-                updateAdvancementData(entry.groupid, entry.slot, 'slot', slotInput.value);
-                entry.slot = slotInput.value;  // Update the local variable to reflect the change
-            }
-        });
-
-        // Event listener for push competition change
-        pushCompInput.addEventListener('change', function () {
-            updateAdvancementData(entry.groupid, entry.slot, 'pushtocompetition', pushCompInput.value);
-            entry.pushtocompetition = pushCompInput.value;  // Update the local variable to reflect the change
-        });
-
-        // Event listener for push position change
-        pushPosInput.addEventListener('change', function () {
-            updateAdvancementData(entry.groupid, entry.slot, 'pushtoposition', pushPosInput.value);
-            entry.pushtoposition = pushPosInput.value;  // Update the local variable to reflect the change
-        });
-
-        row.appendChild(slotCell);
-        row.appendChild(pushCompCell);
-        row.appendChild(pushPosCell);
-
-        tableBody.appendChild(row); // Add the new row to the table body
-    } else {
-        console.error("Advancement table body not found.");
+function addAdvancementRow(entry, tbody) {
+    if (!tbody) {
+        console.error('No table body found to add the row.');
+        return;
     }
+
+    const row = document.createElement('tr');
+    row.dataset.id = entry.groupid; // Set data-id attribute
+    row.dataset.slot = entry.slot; // Set data-slot attribute
+    row.dataset.type = 'advancement'; // Set data-type attribute
+
+    const createCellWithInput = (value, key) => {
+        const cell = document.createElement('td');
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.value = value;
+        input.classList.add('tablevalue-input');
+        input.dataset.key = key;
+        input.dataset.context = 'advancement';
+        input.dataset.fieldType = 'standard';
+        cell.appendChild(input);
+        return { cell, input };
+    };
+
+    const { cell: slotCell, input: slotInput } = createCellWithInput(entry.slot, 'slot');
+    const { cell: pushCompCell, input: pushCompInput } = createCellWithInput(entry.pushtocompetition, 'pushtocompetition');
+    const { cell: pushPosCell, input: pushPosInput } = createCellWithInput(entry.pushtoposition, 'pushtoposition');
+
+    // Event listener for slot change
+    slotInput.addEventListener('change', function () {
+        if (!slotInput.value || isNaN(slotInput.value)) {
+            // If slot is removed or invalid, remove the row and update data
+            row.remove(); // Remove the row from the table
+            updateAdvancementData(entry.groupid, entry.slot, 'slot', ''); // Clear data
+        } else {
+            updateAdvancementData(entry.groupid, entry.slot, 'slot', slotInput.value);
+            entry.slot = slotInput.value;  // Update the local variable to reflect the change
+        }
+    });
+
+    // Event listener for push competition change
+    pushCompInput.addEventListener('change', function () {
+        updateAdvancementData(entry.groupid, entry.slot, 'pushtocompetition', pushCompInput.value);
+        entry.pushtocompetition = pushCompInput.value;  // Update the local variable to reflect the change
+    });
+
+    // Event listener for push position change
+    pushPosInput.addEventListener('change', function () {
+        updateAdvancementData(entry.groupid, entry.slot, 'pushtoposition', pushPosInput.value);
+        entry.pushtoposition = pushPosInput.value;  // Update the local variable to reflect the change
+    });
+
+    row.appendChild(slotCell);
+    row.appendChild(pushCompCell);
+    row.appendChild(pushPosCell);
+
+    tbody.appendChild(row); // Add the new row to the table body
 }
 
 function updateAdvancementData(id, slot, key, value) {
