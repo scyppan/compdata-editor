@@ -90,7 +90,6 @@ function createSettingsDiv(competitionid) {
     return div;
 }
 
-
 function handleSettingValueChange(id, tag, value){
     if (value === '') {
         deleteSetting(id, tag);
@@ -130,14 +129,33 @@ function handleSettingTagChange(id, oldtag, newtag, select, input) {
 }
 
 function handleSettingValueChange(id, tag, value) {
-    // Find the relevant setting
-    let setting = data['settings'].find(line => line.id == id && line.tag == tag);
-    if (setting) {
-        setting.value = textTags.includes(tag) ? value : parseInt(value, 10);
+    if (value === '') {
+        deleteSetting(id, tag); // Delete the setting if the value is empty
+        // Remove the corresponding row from the table
+        const row = document.querySelector(`tr[data-id='${id}'][data-tag='${tag}']`);
+        if (row) {
+            row.remove();
+        }
+    } else {
+        let setting = data['settings'].find(line => line.id == id && line.tag == tag);
+        if (setting) {
+            setting.value = textTags.includes(tag) ? value : parseInt(value, 10);
+        } else {
+            console.error(`Setting not found for ID: ${id} and tag: ${tag}`);
+        }
+    }
+}
+
+function deleteSetting(id, tag) {
+    const index = data['settings'].findIndex(line => line.id == id && line.tag == tag);
+    if (index !== -1) {
+        data['settings'].splice(index, 1); // Remove the setting from the data array
+        console.log(`Setting with ID: ${id} and tag: ${tag} has been deleted.`);
     } else {
         console.error(`Setting not found for ID: ${id} and tag: ${tag}`);
     }
 }
+
 
 function preventDupSetting(id, oldtag, newtag, select) {
     const isDuplicate = data['settings'].some(line => line.id == id && line.tag === newtag);
@@ -154,7 +172,7 @@ function preventDupSetting(id, oldtag, newtag, select) {
 function deleteSetting(id, tag) {
     const index = data['settings'].findIndex(line => line.id == id && line.tag == tag);
     if (index !== -1) {
-        data['settings'].splice(index, 1);
+        data['settings'].splice(index, 1); // Remove the setting from the data array
         console.log(`Setting with ID: ${id} and tag: ${tag} has been deleted.`);
     } else {
         console.error(`Setting not found for ID: ${id} and tag: ${tag}`);
