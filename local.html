@@ -6,6 +6,7 @@
     <title>Scyppan’s Compdata Editor</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
     <script src="leftpanel.js" defer></script>
     <script src="data.js" defer></script>
     <script src="defaults.js" defer></script>
@@ -23,6 +24,7 @@
     <script src="weatherwindow.js" defer></script>
     <script src="compobj.js" defer></script>
     <script src="messages.js" defer></script>
+    <script src="output.js" defer></script>
     <script src="main.js" defer></script>
 </head>
 <body>
@@ -40,11 +42,14 @@
             </div>
         </div>
         <div class="left-panel" id="leftPanel">
-            <h2>Competitions</h2>
+            <h2>Competitions
+                <button class="download-button" id="downloadButton" title="Download Competitions" onclick='download()'>⇓</button>
+            </h2>
             <div class="competition-list">
                 <ul id="competitionList"></ul>
             </div>
         </div>
+        
         <div class="main-panel" id="mainPanel">
             <h1 id="mainheader">Compdata Editor</h1>
             <div id="fileContent" class="file-content">

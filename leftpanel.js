@@ -10,6 +10,8 @@ function organizeCompetitions(data) {
     } else {
         console.error("compobj is not defined or is not an array.");
     }
+
+
 }
 
 function toggleExpandCollapse(element) {

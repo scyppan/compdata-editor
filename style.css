@@ -526,3 +526,16 @@ ul {
 .round-control:active, .entry-control:active {
     color: #7c7c5a;
 }
+
+.download-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 24px; /* Adjust the size as necessary */
+    color:rgb(199, 200, 218)
+}
+
+.download-button:hover {
+    color: #6a7886; /* Change color on hover */
+    
+}
