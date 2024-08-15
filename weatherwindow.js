@@ -116,9 +116,9 @@ function createWeatherRow(entry, monthName) {
 
             // Event listener for weather data changes
             input.addEventListener('change', function () {
-                updateWeatherData(entry.id, dataPair.title, input.value);
+                updateWeatherData(entry.id, entry.month, dataPair.title, input.value);  // Pass in the month
                 entry[dataPair.title] = parseInt(input.value, 10);  // Update the local variable to reflect the change
-            });
+            });            
 
             cell.appendChild(input);
         }
@@ -129,9 +129,9 @@ function createWeatherRow(entry, monthName) {
     return row;
 }
 
-function updateWeatherData(id, key, value) {
-    // Find the relevant weather entry
-    let entry = data['weather'].find(item => item.id == id);
+function updateWeatherData(id, month, key, value) {
+    // Find the relevant weather entry based on both id and month
+    let entry = data['weather'].find(item => item.id == id && item.month == month);
 
     if (entry) {
         let parsedValue = parseInt(value, 10);
@@ -166,6 +166,6 @@ function updateWeatherData(id, key, value) {
                 return;
         }
     } else {
-        console.error(`Weather entry not found for id ${id}`);
+        console.error(`Weather entry not found for id ${id} and month ${month}`);
     }
 }
