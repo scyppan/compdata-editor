@@ -23,7 +23,7 @@ function createScheduleRow(entry) {
         if (!dayInput.value) {
             // If day is deleted (empty), remove the row and update the data
             row.remove(); // Remove the row from the table
-            deleteScheduleData(entry.id); // Remove the corresponding data entry
+            deleteScheduleData(entry.id, entry.day, entry.min, entry.max, entry.time); // Remove the corresponding data entry
         } else {
             updateScheduleData(entry.id, 'day', dayInput.value);
             entry.day = dayInput.value;  // Update the local variable to reflect the change
@@ -69,7 +69,7 @@ function createScheduleRow(entry) {
 function createScheduleDiv(id) {
     const div = document.createElement('div');
     div.id = 'schedule';
-    div.classList.add('standard-div', 'level-content'); // Ensure it has 'level-content' class
+    div.classList.add('level-content', 'standard-div'); // Ensure it has 'level-content' class
 
     const header = document.createElement('h2');
     header.textContent = `Schedule - ${getRoundData(id)}`;
@@ -105,8 +105,13 @@ function createScheduleDiv(id) {
         return acc;
     }, {});
 
-    // Create a table for each round
+    // Create a parent div for each round
     for (const round in groupedSchedule) {
+        const roundParentDiv = document.createElement('div');
+        roundParentDiv.id = `schedule-table-round-${round}`;
+        roundParentDiv.dataset.id = round;  // Store the round number in the dataset
+        roundParentDiv.classList.add('schedule-round');
+
         const roundHeader = document.createElement('h3');
         roundHeader.textContent = `Round ${round}`;
         
@@ -129,7 +134,7 @@ function createScheduleDiv(id) {
         removeRoundDiv.classList.add('round-control');
         removeRoundDiv.title = `Remove Round ${round}`;
         removeRoundDiv.addEventListener('click', function () {
-            removeRound(id, round);
+            removeRound(id, round, roundParentDiv);
         });
 
         // Add controls to the control panel
@@ -138,7 +143,7 @@ function createScheduleDiv(id) {
 
         // Append controls to the header
         roundHeader.appendChild(roundControls);
-        div.appendChild(roundHeader);
+        roundParentDiv.appendChild(roundHeader);
 
         const table = document.createElement('table');
         table.classList.add('window-tables', 'groupedtables');
@@ -162,7 +167,9 @@ function createScheduleDiv(id) {
         });
 
         table.appendChild(tbody);
-        div.appendChild(table);
+        roundParentDiv.appendChild(table);
+
+        div.appendChild(roundParentDiv);  // Append the entire round div to the main div
     }
 
     return div;
@@ -201,22 +208,26 @@ function updateScheduleData(id, key, value) {
     }
 }
 
-function deleteScheduleData(id) {
-    // Find the index of the relevant schedule entry
-    const index = data['schedule'].findIndex(item => item.id == id);
+function deleteScheduleData(id, day, min, max, time) {
+    // Find the index of the relevant schedule entry that matches all the provided parameters
+    const index = data['schedule'].findIndex(item => 
+        parseInt(item.id) === parseInt(id) && 
+        parseInt(item.day) === parseInt(day) && 
+        parseInt(item.min) === parseInt(min) && 
+        parseInt(item.max) === parseInt(max) && 
+        parseInt(item.time) === parseInt(time)
+    );
 
     if (index !== -1) {
-        // Remove the entry from the array
         data['schedule'].splice(index, 1);
-        console.log(`Schedule entry with id ${id} has been deleted.`);
+        console.log(`Schedule entry with id ${id}, day ${day}, min ${min}, max ${max}, time ${time} has been deleted.`);
     } else {
-        console.error(`Schedule entry not found for id ${id}`);
+        console.error(`Schedule entry not found for id ${id}, day ${day}, min ${min}, max ${max}, time ${time}.`);
     }
 }
 
+
 function addNewRound(id) {
-    console.log("I'm here!");
-    
     // Create a new round with a default round number
     const newRoundNumber = getNextRoundNumber(id);
     const newRoundData = {
@@ -239,70 +250,9 @@ function addNewRound(id) {
         return;
     }
 
-    // Create the new round table and append it
-    const newTable = createScheduleTable(newRoundData); // Create a function to generate just the table
-    scheduleDiv.appendChild(newTable);
-}
-
-function createScheduleTable(roundData) {
-    const roundHeader = document.createElement('h3');
-    roundHeader.textContent = `Round ${roundData.round}`;
-    
-    // Create a control panel for the round
-    const roundControls = document.createElement('div');
-    roundControls.classList.add('round-controls');
-
-    // Add entry control div
-    const addEntryDiv = document.createElement('div');
-    addEntryDiv.innerHTML = '⊕';
-    addEntryDiv.classList.add('entry-control');
-    addEntryDiv.title = `Add Entry to Round ${roundData.round}`;
-    addEntryDiv.addEventListener('click', function () {
-        addNewEntryToRound(roundData.id, roundData.round);
-    });
-
-    // Remove round control div
-    const removeRoundDiv = document.createElement('div');
-    removeRoundDiv.innerHTML = '⊖';
-    removeRoundDiv.classList.add('round-control');
-    removeRoundDiv.title = `Remove Round ${roundData.round}`;
-    removeRoundDiv.addEventListener('click', function () {
-        removeRound(roundData.id, roundData.round);
-    });
-
-    // Add controls to the control panel
-    roundControls.appendChild(addEntryDiv);
-    roundControls.appendChild(removeRoundDiv);
-
-    // Append controls to the header
-    roundHeader.appendChild(roundControls);
-
-    const table = document.createElement('table');
-    table.classList.add('window-tables', 'groupedtables');
-    table.id = `schedule-table-round-${roundData.round}`; // Set the table ID
-    table.dataset.round = roundData.round;
-
-    const thead = document.createElement('thead');
-    const headerRow = document.createElement('tr');
-    ['Day', 'Min', 'Max', 'Time'].forEach(title => {
-        const th = document.createElement('th');
-        th.textContent = title;
-        headerRow.appendChild(th);
-    });
-    thead.appendChild(headerRow);
-    table.appendChild(thead);
-
-    const tbody = document.createElement('tbody');
-    tbody.appendChild(createScheduleRow(roundData)); // Add the new row to the table body
-
-    table.appendChild(tbody);
-
-    // Wrap the table and header together for easy appending
-    const wrapper = document.createElement('div');
-    wrapper.appendChild(roundHeader);
-    wrapper.appendChild(table);
-
-    return wrapper; // Return the full wrapper including the header and table
+    // Create the new round div and append it
+    const newRoundDiv = createScheduleDiv(id); 
+    scheduleDiv.appendChild(newRoundDiv);
 }
 
 function getNextRoundNumber(id) {
@@ -311,14 +261,54 @@ function getNextRoundNumber(id) {
     return existingRounds.length > 0 ? Math.max(...existingRounds) + 1 : 1;
 }
 
-function removeRound(id, round) {
-    // Filter out all entries for the specified round
-    data['schedule'] = data['schedule'].filter(entry => entry.round !== round);
+function removeRound(id, round, wrapper) {
 
-    // Refresh the schedule div
-    const scheduleDiv = document.getElementById('schedule');
-    scheduleDiv.innerHTML = '';
-    scheduleDiv.appendChild(createScheduleDiv(id));
+    let roundsToRemove = data['schedule'].filter(entry => entry.round === parseInt(round) && entry.id === parseInt(id));
+    let roundsToKeep = data['schedule'].filter(entry => entry.round > parseInt(round) && entry.id === parseInt(id));
+
+    // Remove the rounds that need to be deleted
+    roundsToRemove.forEach(rnd => {
+        const index = data['schedule'].indexOf(rnd);
+        if (index > -1) {
+            data['schedule'].splice(index, 1);
+        }
+    });
+
+    // Decrement the round number for the remaining rounds
+    roundsToKeep.forEach(rnd => {
+        rnd.round--;
+    });
+
+    wrapper.remove();
+
+    // Reorder the rounds for the specified competition id to be sequential starting from 1
+    reorderRounds(id);
+}
+
+function reorderRounds(id) {
+    const scheduleData = data['schedule'].filter(entry => entry.id === id);
+
+    // Get all unique rounds sorted in ascending order
+    const uniqueRounds = [...new Set(scheduleData.map(entry => entry.round))].sort((a, b) => a - b);
+
+    // Reassign round numbers to be sequential starting from 1
+    uniqueRounds.forEach((oldRound, index) => {
+        const newRound = index + 1;
+        scheduleData.forEach(entry => {
+            if (entry.round === oldRound) {
+                entry.round = newRound;
+            }
+        });
+    });
+
+    // Update the DOM elements with the class 'schedule-round'
+    let rounds = document.getElementsByClassName('schedule-round');
+
+    for (let i = 0; i < rounds.length; i++) {
+        rounds[i].dataset.round = i + 1;
+        // Update only the text content of the first child (the h3 tag) directly without using querySelector
+        rounds[i].children[0].childNodes[0].textContent = `Round ${i + 1}`;
+    }
 }
 
 function addNewEntryToRound(id, round) {

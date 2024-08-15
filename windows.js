@@ -18,14 +18,7 @@ function parentDiv() {
 
 function populateWindow(level, id){ 
 
-    try { document.getElementById('advancement').remove(); } catch (e) {}
-    try { document.getElementById('competitions').remove(); } catch (e) {}
-    try { document.getElementById('objectives').remove(); } catch (e) {}
-    try { document.getElementById('schedule').remove(); } catch (e) {}
-    try { document.getElementById('tasks').remove(); } catch (e) {}
-    try { document.getElementById('weather').remove(); } catch (e) {}
-    try { document.getElementById('standings').remove(); } catch (e) {}
-
+    removeAllStandardDivs();
 
     switch(level){
         case 0: buildwindow0(); break;

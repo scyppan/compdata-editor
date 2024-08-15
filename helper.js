@@ -139,3 +139,10 @@ function findLastCompInHierarchy(startLine, level) {
 
     return lastLine;
 }
+
+function removeAllStandardDivs() {
+    const standardDivs = document.querySelectorAll('.standard-div');
+    standardDivs.forEach(div => {
+        div.remove();
+    });
+}
