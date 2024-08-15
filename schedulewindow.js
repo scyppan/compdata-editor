@@ -69,20 +69,11 @@ function createScheduleRow(entry) {
 function createScheduleDiv(id) {
     const div = document.createElement('div');
     div.id = 'schedule';
-    div.classList.add('level-content', 'standard-div'); // Ensure it has 'level-content' class
+    div.classList.add('level-content','standard-div'); // Ensure it has 'level-content' class
 
     const header = document.createElement('h2');
     header.textContent = `Schedule - ${getRoundData(id)}`;
     div.appendChild(header);
-
-    // Create a div to add a new round
-    const addRoundDiv = document.createElement('div');
-    addRoundDiv.innerHTML = '⊕ New Round';
-    addRoundDiv.classList.add('round-control');
-    addRoundDiv.addEventListener('click', function () {
-        addNewRound(id);
-    });
-    div.appendChild(addRoundDiv);
 
     // Get schedule data for the specified id
     const scheduleData = getDataForId('schedule', id);
@@ -105,72 +96,24 @@ function createScheduleDiv(id) {
         return acc;
     }, {});
 
-    // Create a parent div for each round
+    // Create a wrapper for each round and append to the div
     for (const round in groupedSchedule) {
-        const roundParentDiv = document.createElement('div');
-        roundParentDiv.id = `schedule-table-round-${round}`;
-        roundParentDiv.dataset.id = round;  // Store the round number in the dataset
-        roundParentDiv.classList.add('schedule-round');
-
-        const roundHeader = document.createElement('h3');
-        roundHeader.textContent = `Round ${round}`;
-        
-        // Create a control panel for the round
-        const roundControls = document.createElement('div');
-        roundControls.classList.add('round-controls');
-
-        // Add entry control div
-        const addEntryDiv = document.createElement('div');
-        addEntryDiv.innerHTML = '⊕';
-        addEntryDiv.classList.add('entry-control');
-        addEntryDiv.title = `Add Entry to Round ${round}`;
-        addEntryDiv.addEventListener('click', function () {
-            addNewEntryToRound(id, round);
-        });
-
-        // Remove round control div
-        const removeRoundDiv = document.createElement('div');
-        removeRoundDiv.innerHTML = '⊖';
-        removeRoundDiv.classList.add('round-control');
-        removeRoundDiv.title = `Remove Round ${round}`;
-        removeRoundDiv.addEventListener('click', function () {
-            removeRound(id, round, roundParentDiv);
-        });
-
-        // Add controls to the control panel
-        roundControls.appendChild(addEntryDiv);
-        roundControls.appendChild(removeRoundDiv);
-
-        // Append controls to the header
-        roundHeader.appendChild(roundControls);
-        roundParentDiv.appendChild(roundHeader);
-
-        const table = document.createElement('table');
-        table.classList.add('window-tables', 'groupedtables');
-        table.id = `schedule-table-round-${round}`; // Set the table ID
-        table.dataset.round = round;
-
-        const thead = document.createElement('thead');
-        const headerRow = document.createElement('tr');
-        ['Day', 'Min', 'Max', 'Time'].forEach(title => {
-            const th = document.createElement('th');
-            th.textContent = title;
-            headerRow.appendChild(th);
-        });
-        thead.appendChild(headerRow);
-        table.appendChild(thead);
-
-        const tbody = document.createElement('tbody');
-
-        groupedSchedule[round].forEach(entry => {
-            tbody.appendChild(createScheduleRow(entry));
-        });
-
-        table.appendChild(tbody);
-        roundParentDiv.appendChild(table);
-
-        div.appendChild(roundParentDiv);  // Append the entire round div to the main div
+        const roundWrapper = createRoundWrapper(id, groupedSchedule[round][0]); // Pass the first entry for the round
+        div.appendChild(roundWrapper);
     }
+
+    // Create a div to add a new round
+    const addRoundDiv = document.createElement('div');
+    addRoundDiv.innerHTML = '⊕ New Round';
+    addRoundDiv.classList.add('round-control');
+
+    // Add the event listener for adding new rounds
+    addRoundDiv.addEventListener('click', function () {
+        console.log("YEY");
+        addNewRound(id);
+    });
+    
+    div.appendChild(addRoundDiv);
 
     return div;
 }
@@ -226,9 +169,7 @@ function deleteScheduleData(id, day, min, max, time) {
     }
 }
 
-
 function addNewRound(id) {
-    // Create a new round with a default round number
     const newRoundNumber = getNextRoundNumber(id);
     const newRoundData = {
         id: id,
@@ -244,16 +185,25 @@ function addNewRound(id) {
 
     // Get the existing schedule div
     const scheduleDiv = document.getElementById('schedule');
-    
     if (!scheduleDiv) {
         console.error('Schedule div not found.');
         return;
     }
 
-    // Create the new round div and append it
-    const newRoundDiv = createScheduleDiv(id); 
-    scheduleDiv.appendChild(newRoundDiv);
+    // Create the new round wrapper
+    const newRoundWrapper = createRoundWrapper(id, newRoundData);
+
+    // Insert the new round wrapper as the penultimate child
+    const childrenCount = scheduleDiv.children.length;
+    if (childrenCount > 0) {
+        // Insert the new round wrapper before the last child (which is the "New Round" control)
+        scheduleDiv.insertBefore(newRoundWrapper, scheduleDiv.children[childrenCount - 1]);
+    } else {
+        // If there are no children, append the new round wrapper as the first child
+        scheduleDiv.appendChild(newRoundWrapper);
+    }
 }
+
 
 function getNextRoundNumber(id) {
     const scheduleData = getDataForId('schedule', id);
@@ -331,4 +281,71 @@ function addNewEntryToRound(id, round) {
     } else {
         console.error('Could not find table for round:', round);
     }
+}
+
+function createRoundWrapper(id, roundData) {
+    const roundNumber = roundData.round;
+
+    const newRoundWrapper = document.createElement('div');
+    newRoundWrapper.id = `schedule-table-round-${roundNumber}`;
+    newRoundWrapper.classList.add('schedule-round');
+    newRoundWrapper.dataset.round = roundNumber;
+
+    // Create the new round header
+    const roundHeader = document.createElement('h3');
+    roundHeader.textContent = `Round ${roundNumber}`;
+
+    // Create a control panel for the round
+    const roundControls = document.createElement('div');
+    roundControls.classList.add('round-controls');
+
+    // Add entry control div
+    const addEntryDiv = document.createElement('div');
+    addEntryDiv.innerHTML = '⊕';
+    addEntryDiv.classList.add('entry-control');
+    addEntryDiv.title = `Add Entry to Round ${roundNumber}`;
+    addEntryDiv.addEventListener('click', function () {
+        addNewEntryToRound(id, roundNumber);
+    });
+
+    // Remove round control div
+    const removeRoundDiv = document.createElement('div');
+    removeRoundDiv.innerHTML = '⊖';
+    removeRoundDiv.classList.add('round-control');
+    removeRoundDiv.title = `Remove Round ${roundNumber}`;
+    removeRoundDiv.addEventListener('click', function () {
+        removeRound(id, roundNumber, newRoundWrapper);
+    });
+
+    // Add controls to the control panel
+    roundControls.appendChild(addEntryDiv);
+    roundControls.appendChild(removeRoundDiv);
+
+    // Append controls to the header
+    roundHeader.appendChild(roundControls);
+    newRoundWrapper.appendChild(roundHeader);
+
+    // Create the new round table
+    const table = document.createElement('table');
+    table.classList.add('window-tables', 'groupedtables');
+    table.id = `schedule-table-round-${roundNumber}`;
+    table.dataset.round = roundNumber;
+
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    ['Day', 'Min', 'Max', 'Time'].forEach(title => {
+        const th = document.createElement('th');
+        th.textContent = title;
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+    tbody.appendChild(createScheduleRow(roundData)); // Add the new row to the table body
+    table.appendChild(tbody);
+
+    newRoundWrapper.appendChild(table);
+
+    return newRoundWrapper;
 }
