@@ -69,7 +69,7 @@ function createScheduleRow(entry) {
 function createScheduleDiv(id) {
     const div = document.createElement('div');
     div.id = 'schedule';
-    div.classList.add('level-content','standard-div'); // Ensure it has 'level-content' class
+    div.classList.add('level-content', 'standard-div'); // Ensure it has 'level-content' class
 
     const header = document.createElement('h2');
     header.textContent = `Schedule - ${getRoundData(id)}`;
@@ -84,6 +84,21 @@ function createScheduleDiv(id) {
         scheduleParagraph.textContent = 'No schedules';
         scheduleParagraph.style.fontSize = "12px";
         div.appendChild(scheduleParagraph); // Append the message to the main div
+
+        // Add a button to create the initial schedule round
+        const createButton = document.createElement('button');
+        createButton.textContent = 'Create Schedule Data for Round 1';
+        createButton.addEventListener('click', function () {
+            // Call the function to add a new round, which is the correct way to create schedule data
+            addNewRound(id);
+
+            // Re-render the div with the new schedule data
+            div.innerHTML = ''; // Clear the div
+            const newDiv = createScheduleDiv(id); // Re-create the div with new data
+            div.appendChild(newDiv); // Append new content
+        });
+
+        div.appendChild(createButton); // Append the button to the div
         return div; // Return early if there are no schedules
     }
 
@@ -109,10 +124,9 @@ function createScheduleDiv(id) {
 
     // Add the event listener for adding new rounds
     addRoundDiv.addEventListener('click', function () {
-        console.log("YEY");
         addNewRound(id);
     });
-    
+
     div.appendChild(addRoundDiv);
 
     return div;
@@ -203,7 +217,6 @@ function addNewRound(id) {
         scheduleDiv.appendChild(newRoundWrapper);
     }
 }
-
 
 function getNextRoundNumber(id) {
     const scheduleData = getDataForId('schedule', id);
