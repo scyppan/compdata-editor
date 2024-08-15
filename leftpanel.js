@@ -10,8 +10,6 @@ function organizeCompetitions(data) {
     } else {
         console.error("compobj is not defined or is not an array.");
     }
-
-
 }
 
 function toggleExpandCollapse(element) {
@@ -110,16 +108,6 @@ function appendCompetition(comp, parentElement, expandedState = {}) {
     });
 
     parentElement.appendChild(listItem);
-}
-
-function getExpandedState() {
-    const expandedState = {};
-    document.querySelectorAll('#competitionList li').forEach(item => {
-        const compid = item.dataset.compid;
-        const isExpanded = item.querySelector('ul') && item.querySelector('ul').style.display !== 'none';
-        expandedState[compid] = isExpanded;
-    });
-    return expandedState;
 }
 
 function getExpandedState() {

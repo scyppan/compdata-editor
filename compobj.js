@@ -163,6 +163,9 @@ function createNewCompObj(parentId, compName, level, listElement) {
         listElement.appendChild(newCompElement);
      }
     
+     // Sort compobj array by id
+    data['compobj'].sort((a, b) => a.line - b.line);
+
     organizeCompetitions(data);
     restoreExpandedState(expandedState); 
 }
