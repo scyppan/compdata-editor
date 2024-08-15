@@ -125,18 +125,20 @@ function findLastValidLine() {
 
 function findLastCompInHierarchy(startLine, level) {
     let lastLine = startLine;
+    let validParents = [data['compobj'][startLine].line]; // Start with the initial parent
 
     for (let i = 0; i < data['compobj'].length; i++) {
         const comp = data['compobj'][i];
 
         // Ensure we are only considering elements within the same hierarchy
-        if (comp.line > startLine && comp.level > level && comp.parent === data['compobj'][lastLine].id) {
+        if (comp.line > startLine && comp.level > level && validParents.includes(comp.parent)) {
             lastLine = comp.line; // Update lastLine if this is a valid descendant
+            validParents.push(comp.line); // Add this line as a valid parent for future iterations
         } else if (comp.line > startLine && comp.level <= level) {
             break; // Stop when we reach an element at the same or higher level
         }
     }
-
+    
     return lastLine;
 }
 

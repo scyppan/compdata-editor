@@ -184,30 +184,32 @@ function pushSubsequentCompObjs(startPoint){
 }
 
 function removeCompObj(id, elementToRemove) {
-    
     const firstDeletionPoint = data['compobj'].findIndex(obj => obj.line === id);
     if (firstDeletionPoint === -1) return; // Object not found, do nothing
 
-    let compobj = data['compobj'][firstDeletionPoint];
-    let lastDeletionPoint = findLastCompInHierarchy(id, compobj.level);
+    const compobj = data['compobj'][firstDeletionPoint];
+    const lastDeletionPoint = findLastCompInHierarchy(id, compobj.level);
 
-    let deletionCount = (lastDeletionPoint !== -1) ? lastDeletionPoint - firstDeletionPoint + 1 : 1;
-    console.log(deletionCount);
+    // Calculate how many items should be deleted
+    const deletionCount = (lastDeletionPoint !== -1) ? lastDeletionPoint - firstDeletionPoint + 1 : 1;
 
+    // Adjust the lines and parents for objects after the deletion
     data['compobj'].forEach(comp => {
-        if (comp.id >= id) {
-            // Reduce the parent if it is greater than or equal to the deleted id
-            comp.parent -= deletionCount;
-    
-            // Reduce the id value itself to reflect the shift caused by deletion
-            comp.id -= deletionCount;
+        if (comp.line > lastDeletionPoint) {
+            // Only adjust objects that come after the last deletion point
+            comp.line -= deletionCount;
+            if (comp.parent >= id) {
+                comp.parent -= deletionCount;
+            }
         }
     });
-    
+
     // Perform the deletion
     data['compobj'].splice(firstDeletionPoint, deletionCount);
 
+    removeCompObjReferences(firstDeletionPoint, lastDeletionPoint);
 
+    // Update references
     updateAllReferences(id, -deletionCount);
 
     // Remove the element from the DOM
@@ -217,4 +219,34 @@ function removeCompObj(id, elementToRemove) {
     let expandedState = getExpandedState();
     organizeCompetitions(data);
     restoreExpandedState(expandedState);
+}
+
+function removeCompObjReferences(firstDeletionPoint, lastDeletionPoint) {
+    const linesToRemove = new Set();
+
+    // Collect all lines that will be removed
+    for (let i = firstDeletionPoint; i <= lastDeletionPoint; i++) {
+        const line = data['compobj'][i].line;
+        linesToRemove.add(line);
+    }
+
+    // List of tables to check for references
+    const tablesToUpdate = ['settings', 'tasks', 'schedule', 'standings', 'objectives', 'weather']; 
+
+    // Loop through each table and remove any references to the lines being deleted
+    tablesToUpdate.forEach(table => {
+        if (data[table] && Array.isArray(data[table])) {
+            data[table] = data[table].filter(entry => {
+                const entryId = entry.id || entry.compid; // Adjust this if your IDs are stored under a different field
+                return !linesToRemove.has(entryId);
+            });
+        }
+    });
+
+    // Special handling for the 'advancement' table
+    if (data['advancement'] && Array.isArray(data['advancement'])) {
+        data['advancement'] = data['advancement'].filter(entry => {
+            return !linesToRemove.has(entry.pushtocompetition) && !linesToRemove.has(entry.groupid);
+        });
+    }
 }
