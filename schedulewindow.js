@@ -22,13 +22,23 @@ function createScheduleRow(entry) {
     dayInput.addEventListener('change', function () {
         if (!dayInput.value) {
             // If day is deleted (empty), remove the row and update the data
+            const roundWrapper = row.closest('.schedule-round'); // Get the round wrapper element
             row.remove(); // Remove the row from the table
             deleteScheduleData(entry.id, entry.day, entry.min, entry.max, entry.time); // Remove the corresponding data entry
+    
+            // Check if there are any remaining rows for this round
+            const roundTableBody = roundWrapper.querySelector('tbody');
+            if (roundTableBody && roundTableBody.children.length === 0) {
+                // No remaining rows, so remove the entire round
+                const roundNumber = parseInt(roundWrapper.dataset.round, 10);
+                removeRound(entry.id, roundNumber, roundWrapper);
+            }
         } else {
             updateScheduleData(entry.id, 'day', dayInput.value);
             entry.day = dayInput.value;  // Update the local variable to reflect the change
         }
     });
+    
 
     // Min cell with input
     const { cell: minCell, input: minInput } = createCellWithInput('number', entry.min, 'min');
