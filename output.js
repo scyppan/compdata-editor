@@ -51,14 +51,14 @@ function compobjToTxt(compobjArray) {
     return compobjArray
         .filter(entry => !Object.values(entry).includes(null)) // Filter out rows with any null values
         .map(entry => `${entry.line},${entry.level},${entry.shortname},${entry.longname},${entry.parent}`)
-        .join('\n');
+        .join('\n') + '\n';
 }
 
 function compidsToTxt(compobjArray) {
     return compobjArray
         .filter(entry => entry.level === 3) // Filter only those with level 3
         .map(entry => entry.line) // Extract the 'line' value
-        .join('\n'); // Join them with new lines
+        .join('\n') + '\n'; // Join them with new lines
 }
 
 function exportAdvancementData() {
@@ -77,7 +77,7 @@ function advancementToTxt(advancementArray) {
     return advancementArray
         .filter(entry => !Object.values(entry).includes(null)) // Filter out rows with any null values
         .map(entry => `${entry.groupid},${entry.slot},${entry.pushtocompetition},${entry.pushtoposition}`)
-        .join('\n');
+        .join('\n') + '\n';
 }
 
 function exportObjectivesData() {
@@ -96,7 +96,7 @@ function objectivesToTxt(objectivesArray) {
     return objectivesArray
         .filter(entry => !Object.values(entry).includes(null)) // Filter out rows with any null values
         .map(entry => `${entry.id},${entry.objective},${entry.value}`)
-        .join('\n');
+        .join('\n') + '\n';
 }
 
 function exportScheduleData() {
@@ -115,7 +115,7 @@ function scheduleToTxt(scheduleArray) {
     return scheduleArray
         .filter(entry => !Object.values(entry).includes(null)) // Filter out rows with any null values
         .map(entry => `${entry.id},${entry.day},${entry.round},${entry.min},${entry.max},${entry.time}`)
-        .join('\n');
+        .join('\n') + '\n';
 }
 
 function exportSettingsData() {
@@ -134,7 +134,7 @@ function settingsToTxt(settingsArray) {
     return settingsArray
         .filter(entry => !Object.values(entry).includes(null)) // Filter out rows with any null values
         .map(entry => `${entry.id},${entry.tag},${entry.value}`)
-        .join('\n');
+        .join('\n') + '\n';
 }
 
 function exportStandingsData() {
@@ -153,7 +153,7 @@ function standingsToTxt(standingsArray) {
     return standingsArray
         .filter(entry => !Object.values(entry).includes(null)) // Filter out rows with any null values
         .map(entry => `${entry.id},${entry.position}`)
-        .join('\n');
+        .join('\n') + '\n';
 }
 
 function exportTasksData() {
@@ -172,7 +172,7 @@ function tasksToTxt(tasksArray) {
     return tasksArray
         .filter(entry => !Object.values(entry).includes(null)) // Filter out rows with any null values
         .map(entry => `${entry.id},${entry.when},${entry.description},${entry.param1},${entry.param2},${entry.param3},${entry.param4}`)
-        .join('\n');
+        .join('\n') + '\n';
 }
 
 function exportWeatherData() {
@@ -191,5 +191,5 @@ function weatherToTxt(weatherArray) {
     return weatherArray
         .filter(entry => !Object.values(entry).includes(null)) // Filter out rows with any null values
         .map(entry => `${entry.id},${entry.month},${entry.chancedry},${entry.chancerain},${entry.chancesnow},${entry.chanceovercast},${entry.sunset},${entry.sunrise},${entry.nighttime}`)
-        .join('\n');
+        .join('\n') + '\n';
 }
