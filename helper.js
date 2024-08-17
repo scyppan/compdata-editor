@@ -75,7 +75,7 @@ function getDataForId(type, id) {
 
 function findLastCompOfLvl(lvl, parent){
 
-    let lastCompOfLevel = -1;
+    let lastCompOfLevel = parent;
     data['compobj'].forEach(comp => {
         if (comp.level === lvl && comp.parent==parent) {
             lastCompOfLevel = comp.line;
