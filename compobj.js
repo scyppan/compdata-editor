@@ -28,7 +28,6 @@ function updateTaskReferences(newLine, amt) {
             task.id+=amt;
         }
         
-
         if(task.description=='UpdateTable'||task.description=='FillFromCompTableBackup'||task.description=='FillFromCompTablePosBackupSameLeague'||task.description=='FillFromCompTableBackupLeague'){
             if (task.param1 >= newLine) task.param1 += amt;
             if (task.param2 >= newLine) task.param2 += amt;

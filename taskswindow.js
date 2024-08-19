@@ -246,14 +246,12 @@ function updateTaskDataForHiddenFields(task) {
     }
 }
 
-function updateTaskData(id, key, value) {
-    // Find the relevant task entry
-    let entry = data['tasks'].find(item => item.id == id);
+function updateTaskData(entry, key, value) {
 
     if (entry) {
         entry[key] = value;
     } else {
-        console.error(`Task entry not found for id ${id}`);
+        console.error(`NO TASK!`);
     }
 }
 
