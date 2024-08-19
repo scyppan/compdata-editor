@@ -29,14 +29,23 @@ function updateTaskReferences(newLine, amt) {
         if(task.id>=newLine){
             task.id+=amt;
         }
-        
-        if(task.description=='UpdateTable'||task.description=='FillFromCompTableBackup'||task.description=='FillFromCompTablePosBackupSameLeague'||task.description=='FillFromCompTableBackupLeague'){
+
+        if (
+            task.description === 'UpdateTable' ||
+            task.description === 'FillFromCompTablePosBackupSameLeague' ||
+            task.description === 'FillFromCompTableBackupLeague' ||
+            task.description === 'FillFromCompTable'
+        ) {
             if (task.param1 >= newLine) task.param1 += amt;
             if (task.param2 >= newLine) task.param2 += amt;
-        }else{
+        }else if(task.description=='FillFromCompTableBackup'){
+            if (task.param1 >= newLine) task.param1 += amt;
+            if (task.param2 >= newLine) task.param2 += amt;
+            if (task.param3 >= newLine) task.param3 += amt;
+        }
+        else{
             if (task.param1 >= newLine) task.param1 += amt;
         }
-
     });
 }
 
