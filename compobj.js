@@ -1,3 +1,5 @@
+const settingswithrefs=['rule_suspension', 'schedule_forcecomp', 'schedule_use_dates_comp', 'advance_maxteamsstageref', 'advance_standingskeep', 'advance_standingsrank', 'advance_pointskeep', 'standings_checkrank'];
+
 function updateAllReferences(newLine, amt) {
     // Update advancement
     updateAdvancementReferences(newLine, amt);
@@ -75,6 +77,10 @@ function updateSettingsReferences(newLine, amt) {
         // If the id references a line number greater than or equal to newLine, increment it
         if (entry.id >= newLine) {
             entry.id += amt;
+
+            if (entry.tag && settingswithrefs.includes(entry.tag)) {
+                entry.value+=amt;
+            }
         }
     });
 }
