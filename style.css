@@ -539,3 +539,17 @@ ul {
     color: #6a7886; /* Change color on hover */
     
 }
+
+.competition-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.competition-item input {
+    width: 100px; /* Adjust width as needed */
+}
+
+.competition-item .delete-button {
+    margin-left: 10px; /* Space between input and delete button */
+}

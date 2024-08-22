@@ -149,12 +149,49 @@ function createCompetitionDivElement(child) {
     // Set cursor to pointer to indicate clickability
     divElement.style.cursor = 'pointer';
 
+    // Create a container for the inputs and save button
+    const inputContainer = document.createElement('div');
+    inputContainer.style.display = 'flex';
+    inputContainer.style.alignItems = 'center'; // Vertically center the items
+    inputContainer.style.gap = '10px'; // Space between elements
+
+    divElement.appendChild(inputContainer);
+
     // Create the text node (editable)
     const nameToDisplay = replaceNames(divElement.dataset.name, data["compobj"]);
     const textNode = document.createElement('span');
     textNode.textContent = nameToDisplay;
     textNode.contentEditable = false; // Disable editing by default
-    divElement.appendChild(textNode);
+
+    // Create the input fields for shortname and longname
+    const shortNameInput = document.createElement('input');
+    shortNameInput.type = 'text';
+    shortNameInput.value = child.shortname;
+    shortNameInput.style.display = 'none'; // Hide initially
+
+    const longNameInput = document.createElement('input');
+    longNameInput.type = 'text';
+    longNameInput.value = child.longname;
+    longNameInput.style.display = 'none'; // Hide initially
+
+    // Create the save button (✔)
+    const saveButton = document.createElement('span');
+    saveButton.innerHTML = '✔';
+    saveButton.style.display = 'none'; // Hide initially
+    saveButton.style.cursor = 'pointer'; // Set cursor to pointer
+
+    inputContainer.appendChild(shortNameInput);
+    inputContainer.appendChild(longNameInput);
+    inputContainer.appendChild(textNode);
+    inputContainer.appendChild(saveButton);
+
+    saveButton.style.color = 'green';
+    saveButton.style.fontSize = '16px'; // Adjust size to match input fields
+    saveButton.style.lineHeight = '1'; // Align vertically with text
+    shortNameInput.style.width = '60px';
+    shortNameInput.style.height = '25px'; // Match with text height
+    longNameInput.style.width = '120px';
+    longNameInput.style.height = '25px'; // Match with text height
 
     // Create the delete button
     const deleteButton = document.createElement('span');
@@ -162,24 +199,42 @@ function createCompetitionDivElement(child) {
     deleteButton.innerHTML = '⊖'; // Use the correct HTML entity for a minus sign inside a circle
     deleteButton.style.display = 'none'; // Hidden by default
     deleteButton.style.cursor = 'pointer'; // Set cursor to pointer for delete button
-    divElement.appendChild(deleteButton);
+    inputContainer.appendChild(deleteButton);
 
     // Event listener to make the text editable and show the delete button
     divElement.addEventListener('click', function(event) {
         event.stopPropagation(); // Prevent triggering the document click event
         closeAllEditableElements(); // Close all other editable elements before opening this one
 
-        textNode.contentEditable = true;
-        textNode.focus();
+        textNode.style.display = 'none';
+        shortNameInput.style.display = 'inline';
+        longNameInput.style.display = 'inline';
+        saveButton.style.display = 'inline';
+        
+        // Check if neither input is focused, then focus on the shortNameInput
+        if (document.activeElement !== shortNameInput && document.activeElement !== longNameInput) {
+            shortNameInput.focus(); // Focus on the shortname input only if neither input is already focused
+        }
+
         deleteButton.style.display = 'inline'; // Show delete button
     });
 
-    // Handle "Esc" key to exit editing mode
-    textNode.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-            closeEditableElement(divElement); // Close this element's editing mode
+    saveButton.addEventListener('click', function(event) {
+        event.stopPropagation(); // Prevent triggering other click events
+        commitChangesAndClose(shortNameInput, longNameInput, textNode, divElement);
+    });    
+    
+    shortNameInput.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            commitChangesAndClose(shortNameInput, longNameInput, textNode, divElement);
         }
     });
+    
+    longNameInput.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            commitChangesAndClose(shortNameInput, longNameInput, textNode, divElement);
+        }
+    });  
 
     // Event listener for the delete button
     deleteButton.addEventListener('click', function(e) {
@@ -195,14 +250,40 @@ function createCompetitionDivElement(child) {
         updateCompObjName(divElement.dataset.compid, divElement.dataset.name);
     });
 
+    shortNameInput.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            commitChangesAndClose(shortNameInput,longNameInput,textNode, divElement);
+        }
+    });
+    
+    longNameInput.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            commitChangesAndClose(shortNameInput,longNameInput, textNode, divElement);
+        }
+    });
+    
     return divElement;
 }
 
 function closeEditableElement(element) {
-    const textNode = element.querySelector('span');
-    const deleteButton = element.querySelector('.delete-button');
-    if (textNode) textNode.contentEditable = false;
+    const inputContainer = element.querySelector('div');
+    
+    if (!inputContainer) return; // Safeguard to ensure the input container exists
+
+    const shortNameInput = inputContainer.querySelector('input:nth-child(1)');
+    const longNameInput = inputContainer.querySelector('input:nth-child(2)');
+    const saveButton = inputContainer.querySelector('span:nth-child(4)'); // Ensure this targets the correct save button
+    const deleteButton = inputContainer.querySelector('.delete-button');
+    const textNode = inputContainer.querySelector('span'); // Ensure this targets the correct text element
+
+    // Hide inputs and buttons
+    if (shortNameInput) shortNameInput.style.display = 'none';
+    if (longNameInput) longNameInput.style.display = 'none';
+    if (saveButton) saveButton.style.display = 'none';
     if (deleteButton) deleteButton.style.display = 'none';
+
+    // Show the text node
+    if (textNode) textNode.style.display = 'inline';
 }
 
 function closeAllEditableElements() {
@@ -215,11 +296,20 @@ document.addEventListener('click', function() {
     closeAllEditableElements(); // Close all editable elements when clicking outside
 });
 
-function updateCompObjName(compId, newName) {
-    // Update the compobj name based on compId
+function updateCompObjNames(compId, newShortName, newLongName) {
     const compObj = data['compobj'].find(obj => obj.line === compId);
     if (compObj) {
-        compObj.longname = newName;
+        compObj.shortname = newShortName;
+        compObj.longname = newLongName;
+    }
+
+    // Update names in the left panel UI
+    const listItem = document.querySelector(`#competitionList li[data-compid='${compId}']`);
+    if (listItem) {
+        const textNode = listItem.querySelector('span');
+        if (textNode) {
+            textNode.textContent = `${newLongName} (${compId})`;
+        }
     }
 }
 
@@ -245,3 +335,22 @@ function getRemovalCount(){
     return removalCount;
 }
 
+function commitChangesAndClose(shortNameInput, longNameInput, textNode, divElement) {
+    if (!shortNameInput || !longNameInput) {
+        console.error("Input elements are not defined!");
+        return;
+    }
+
+    const newShortName = shortNameInput.value.trim();
+    const newLongName = longNameInput.value.trim();
+    textNode.textContent = newLongName;
+
+    // Commit the changes
+    updateCompObjNames(divElement.dataset.compid, newShortName, newLongName);
+    let compObj=data['compobj'][divElement.dataset.compid];
+    compObj.shortname=newShortName;
+    compObj.longname=newLongName;
+
+    // Close the input mode
+    closeAllEditableElements(); // Use the existing function to close the inputs and restore the text
+}
