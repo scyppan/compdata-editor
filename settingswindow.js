@@ -156,16 +156,22 @@ function deleteSetting(id, tag) {
     }
 }
 
-
 function preventDupSetting(id, oldtag, newtag, select) {
-    const isDuplicate = data['settings'].some(line => line.id == id && line.tag === newtag);
 
-    if (isDuplicate) {
-        createMessage("Duplicate setting tag", 'error'); // Show error message
-        select.value = oldtag;
-        return false; // Prevent further action
+    const allowedDuplicateTags = ['standings_sort'];
+    const allowDuplicate = allowedDuplicateTags.includes(newtag);
+
+    if (!allowDuplicate) {
+        const isDuplicate = data['settings'].some(line => line.id == id && line.tag === newtag);
+
+        if (isDuplicate) {
+            createMessage("Duplicate setting tag", 'error'); // Show error message
+            select.value = oldtag;
+            return false; // Prevent further action
+        }
     }
 
+    // If we reach here, either duplication is allowed, or no duplicate was found
     return true;
 }
 
@@ -177,18 +183,6 @@ function deleteSetting(id, tag) {
     } else {
         console.error(`Setting not found for ID: ${id} and tag: ${tag}`);
     }
-}
-
-function preventDupSetting(id, oldtag, newtag, select) {
-    const isDuplicate = data['settings'].some(line => line.id == id && line.tag === newtag);
-
-    if (isDuplicate) {
-        createMessage("Duplicate setting tag", 'error'); // Show error message
-        select.value = oldtag;
-        return false; // Prevent further action
-    }
-
-    return true;
 }
 
 function deleteSetting(id, tag) {
