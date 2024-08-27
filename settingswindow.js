@@ -158,7 +158,11 @@ function deleteSetting(id, tag) {
 
 function preventDupSetting(id, oldtag, newtag, select) {
 
-    const allowedDuplicateTags = ['standings_sort'];
+    const allowedDuplicateTags = ['standings_sort', 'info_league_releg', 'info_slot_releg', 
+    'info_color_slot_releg', 'info_league_promo', 'info_prize_money_promo', 
+    'info_slot_promo', 'info_slot_promo_poss', 'info_color_slot_promo', 
+    'info_color_slot_promo_poss', 'info_slot_releg_poss', 'info_color_slot_releg_poss', 
+     ];
     const allowDuplicate = allowedDuplicateTags.includes(newtag);
 
     if (!allowDuplicate) {
