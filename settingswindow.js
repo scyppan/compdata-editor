@@ -158,22 +158,22 @@ function deleteSetting(id, tag) {
 
 function preventDupSetting(id, oldtag, newtag, select) {
 
-    const allowedDuplicateTags = ['standings_sort', 'info_league_releg', 'info_slot_releg', 
-    'info_color_slot_releg', 'info_league_promo', 'info_prize_money_promo', 
-    'info_slot_promo', 'info_slot_promo_poss', 'info_color_slot_promo', 
-    'info_color_slot_promo_poss', 'info_slot_releg_poss', 'info_color_slot_releg_poss', 
-     ];
-    const allowDuplicate = allowedDuplicateTags.includes(newtag);
+    // const allowedDuplicateTags = ['standings_sort', 'info_league_releg', 'info_slot_releg', 
+    // 'info_color_slot_releg', 'info_league_promo', 'info_prize_money_promo', 
+    // 'info_slot_promo', 'info_slot_promo_poss', 'info_color_slot_promo', 
+    // 'info_color_slot_promo_poss', 'info_slot_releg_poss', 'info_color_slot_releg_poss', 
+    //  ];
+    // const allowDuplicate = allowedDuplicateTags.includes(newtag);
 
-    if (!allowDuplicate) {
-        const isDuplicate = data['settings'].some(line => line.id == id && line.tag === newtag);
+    // if (!allowDuplicate) {
+    //     const isDuplicate = data['settings'].some(line => line.id == id && line.tag === newtag);
 
-        if (isDuplicate) {
-            createMessage("Duplicate setting tag", 'error'); // Show error message
-            select.value = oldtag;
-            return false; // Prevent further action
-        }
-    }
+    //     if (isDuplicate) {
+    //         createMessage("Duplicate setting tag", 'error'); // Show error message
+    //         select.value = oldtag;
+    //         return false; // Prevent further action
+    //     }
+    // }
 
     // If we reach here, either duplication is allowed, or no duplicate was found
     return true;
