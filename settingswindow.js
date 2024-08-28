@@ -90,115 +90,6 @@ function createSettingsDiv(competitionid) {
     return div;
 }
 
-function handleSettingValueChange(id, tag, value){
-    if (value === '') {
-        deleteSetting(id, tag);
-        // Remove the corresponding row from the table
-        const row = document.querySelector(`tr[data-id='${id}'][data-tag='${tag}']`);
-        if (row) {
-            row.remove();
-        }
-    } else {
-        let setting = data['settings'].find(line => line.id == id && line.tag == tag);
-        if (setting) {
-            setting.value = value;
-        } else {
-            console.error(`Setting not found for ID: ${id} and tag: ${tag}`);
-        }
-    }
-}
-
-function handleSettingTagChange(id, oldtag, newtag, select, input) {
-    // Check for duplicate tags before proceeding
-    if (!preventDupSetting(id, oldtag, newtag, select)) {
-        return; // Exit if a duplicate is found
-    }
-
-    // Find the setting and update the tag
-    let setting = data['settings'].find(line => line.id == id && line.tag == oldtag);
-    if (setting) {
-        setting.tag = newtag;
-
-        // Adjust input type if the new tag requires a different type
-        const requiresText = textTags.includes(newtag);
-        input.type = requiresText ? 'text' : 'number';
-        input.value = requiresText ? '' : 0;
-    } else {
-        console.error(`Setting not found for ID: ${id} and tag: ${oldtag}`);
-    }
-}
-
-function handleSettingValueChange(id, tag, value) {
-    if (value === '') {
-        deleteSetting(id, tag); // Delete the setting if the value is empty
-        // Remove the corresponding row from the table
-        const row = document.querySelector(`tr[data-id='${id}'][data-tag='${tag}']`);
-        if (row) {
-            row.remove();
-        }
-    } else {
-        let setting = data['settings'].find(line => line.id == id && line.tag == tag);
-        if (setting) {
-            setting.value = textTags.includes(tag) ? value : parseInt(value, 10);
-        } else {
-            console.error(`Setting not found for ID: ${id} and tag: ${tag}`);
-        }
-    }
-}
-
-function deleteSetting(id, tag) {
-    const index = data['settings'].findIndex(line => line.id == id && line.tag == tag);
-    if (index !== -1) {
-        data['settings'].splice(index, 1); // Remove the setting from the data array
-        console.log(`Setting with ID: ${id} and tag: ${tag} has been deleted.`);
-    } else {
-        console.error(`Setting not found for ID: ${id} and tag: ${tag}`);
-    }
-}
-
-function preventDupSetting(id, oldtag, newtag, select) {
-
-    // const allowedDuplicateTags = ['standings_sort', 'info_league_releg', 'info_slot_releg', 
-    // 'info_color_slot_releg', 'info_league_promo', 'info_prize_money_promo', 
-    // 'info_slot_promo', 'info_slot_promo_poss', 'info_color_slot_promo', 
-    // 'info_color_slot_promo_poss', 'info_slot_releg_poss', 'info_color_slot_releg_poss', 
-    //  ];
-    // const allowDuplicate = allowedDuplicateTags.includes(newtag);
-
-    // if (!allowDuplicate) {
-    //     const isDuplicate = data['settings'].some(line => line.id == id && line.tag === newtag);
-
-    //     if (isDuplicate) {
-    //         createMessage("Duplicate setting tag", 'error'); // Show error message
-    //         select.value = oldtag;
-    //         return false; // Prevent further action
-    //     }
-    // }
-
-    // If we reach here, either duplication is allowed, or no duplicate was found
-    return true;
-}
-
-function deleteSetting(id, tag) {
-    const index = data['settings'].findIndex(line => line.id == id && line.tag == tag);
-    if (index !== -1) {
-        data['settings'].splice(index, 1); // Remove the setting from the data array
-        console.log(`Setting with ID: ${id} and tag: ${tag} has been deleted.`);
-    } else {
-        console.error(`Setting not found for ID: ${id} and tag: ${tag}`);
-    }
-}
-
-function deleteSetting(id, tag) {
-    const index = data['settings'].findIndex(line => line.id == id && line.tag == tag);
-    if (index !== -1) {
-        data['settings'].splice(index, 1);
-        console.log(`Setting with ID: ${id} and tag: ${tag} has been deleted.`);
-    } else {
-        console.error(`Setting not found for ID: ${id} and tag: ${tag}`);
-    }
-}
-
 function createNewSettingData(competitionid, defaultTag) {
     // Create the new setting entry with a provided default tag and value
     let newSetting = {
@@ -245,13 +136,18 @@ function addSettingRow(setting, tbody) {
 
     // Event listener for tag change
     select.addEventListener('change', function () {
-        handleSettingTagChange(setting.id, setting.tag, select.value, select, input);
+        //handleSettingTagChange(setting.id, setting.tag, select.value, select, input);
         setting.tag = select.value;  // Update the local variable to reflect the change
     });
 
     // Event listener for value change
     input.addEventListener('change', function () {
-        handleSettingValueChange(setting.id, setting.tag, input.value);
+        
+        if(input.value==''){
+            deleteSetting(setting, select);
+        }else{
+            handleSettingValueChange(setting.id, setting.tag, input);
+        }
     });
 
     tagCell.appendChild(select);
@@ -261,3 +157,84 @@ function addSettingRow(setting, tbody) {
     tbody.appendChild(row);
 }
 
+/////////////current edits///////////////
+
+function mapAndFilterMatchingEntries(id, tag) {
+
+    const mappedEntries = data['settings'].map((entry, index) => ({ entry, index }));
+
+    const filteredEntries = mappedEntries.filter(item => item.entry.id == id && item.entry.tag == tag);
+
+    return filteredEntries;
+}
+
+// Helper function to find matching rows in the table
+function findMatchingRows(tbody, tag) {
+    const rows = tbody.querySelectorAll('tr');
+    let matchingrows = [];
+
+    rows.forEach((row) => {
+        if (row.children[0].children[0].value == tag) {
+            matchingrows.push(row);
+        }
+    });
+
+    return matchingrows;
+}
+
+// Helper function to find the final matching index in matching rows
+function findFinalMatchingIndex(matchingrows, element) {
+
+    for (let i = 0; i < matchingrows.length; i++) {
+        if (matchingrows[i] == element.parentElement.parentElement) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+// Helper function to find matching indices in the data array
+function findMatchingIndices(id, tag) {
+    let matchingindices = [];
+    data['settings'].forEach((entry, index) => { 
+        if (entry.tag == tag && entry.id == id) {
+            matchingindices.push(index);
+        }
+    });
+    return matchingindices;
+}
+
+function handleSettingValueChange(id, tag, input) {
+
+            const matchingEntries = mapAndFilterMatchingEntries(id, tag);
+            let tbody = input.closest('tbody');
+            const matchingrows = findMatchingRows(tbody, tag);
+            let finalmatchingindex = findFinalMatchingIndex(matchingrows, input);
+
+            if (finalmatchingindex === -1 || finalmatchingindex >= matchingEntries.length) {
+                return;
+            }
+
+            let matchingentry = matchingEntries[finalmatchingindex].entry;
+
+            if (matchingentry) {
+                matchingentry.value = input.value;
+            }        
+
+}
+
+function deleteSetting(setting, select) {
+    const matchingEntries = mapAndFilterMatchingEntries(setting.id, setting.tag);
+    let tbody = select.closest('tbody');
+    const matchingrows = findMatchingRows(tbody, setting.tag);
+    let finalmatchingindex = findFinalMatchingIndex(matchingrows, select);
+
+    const row = select.parentElement.parentElement; 
+
+    row.remove();
+
+    const getnthmatchingindex = matchingEntries[finalmatchingindex].index;
+    data['settings'].splice(getnthmatchingindex, 1);
+    
+
+}
