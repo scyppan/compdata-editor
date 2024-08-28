@@ -136,8 +136,9 @@ function addSettingRow(setting, tbody) {
 
     // Event listener for tag change
     select.addEventListener('change', function () {
-        //handleSettingTagChange(setting.id, setting.tag, select.value, select, input);
+        
         setting.tag = select.value;  // Update the local variable to reflect the change
+        handleSettingTagChange(setting, input);
     });
 
     // Event listener for value change
@@ -157,7 +158,12 @@ function addSettingRow(setting, tbody) {
     tbody.appendChild(row);
 }
 
-/////////////current edits///////////////
+function handleSettingTagChange(setting, input){
+    console.log("I'm running!", setting, input);
+
+    console.log(textTags.includes(setting.tag));
+    input.type = textTags.includes(setting.tag) ? 'text' : 'number';
+}
 
 function mapAndFilterMatchingEntries(id, tag) {
 
