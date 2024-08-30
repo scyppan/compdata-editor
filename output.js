@@ -190,6 +190,6 @@ function exportWeatherData() {
 function weatherToTxt(weatherArray) {
     return weatherArray
         .filter(entry => !Object.values(entry).includes(null)) // Filter out rows with any null values
-        .map(entry => `${entry.id},${entry.month},${entry.chancedry},${entry.chancerain},${entry.chancesnow},${entry.chanceovercast},${entry.sunset},${entry.sunrise},${entry.nighttime}`)
+        .map(entry => `${entry.id},${entry.month},${entry.chancedry},${entry.chancerain},${entry.chancesnow},${entry.chanceovercast},${entry.unknown},${entry.sunset},${entry.nighttime}`)
         .join('\n') + '\n';
 }
