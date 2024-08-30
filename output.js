@@ -12,11 +12,22 @@ async function download() {
     zip.file('tasks.txt', tasksToTxt(data['tasks']));
     zip.file('weather.txt', weatherToTxt(data['weather']));
 
+    // Generate JSON data blob
+    const jsonDataBlob = await generateJsonDataBlob();
+
+    // Define filename with timestamp
+    const now = new Date();
+    const datetimeString = `${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}-${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}${now.getSeconds().toString().padStart(2, '0')}`;
+    const jsonFileName = `scyppan-${datetimeString}-compdata.json`;
+
+    // Add JSON data to ZIP with the specified filename
+    zip.file(jsonFileName, jsonDataBlob);
+
     // Generate the ZIP file and trigger the download
     const content = await zip.generateAsync({ type: 'blob' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(content);
-    link.download = 'data_export.zip';
+    link.download = `scyppan-${datetimeString}-compdata.zip`;
     link.style.display = 'none';
     document.body.appendChild(link);
     link.click();
@@ -192,4 +203,13 @@ function weatherToTxt(weatherArray) {
         .filter(entry => !Object.values(entry).includes(null)) // Filter out rows with any null values
         .map(entry => `${entry.id},${entry.month},${entry.chancedry},${entry.chancerain},${entry.chancesnow},${entry.chanceovercast},${entry.unknown},${entry.sunset},${entry.nighttime}`)
         .join('\n') + '\n';
+}
+
+async function generateJsonDataBlob() {
+    const filteredData = Object.fromEntries(
+        Object.entries(data).filter(([_, value]) => value !== null)
+    );
+
+    const jsonData = JSON.stringify(filteredData, null, 2); // Convert filtered data to JSON string
+    return new Blob([jsonData], { type: 'application/json' }); // Return the blob
 }
