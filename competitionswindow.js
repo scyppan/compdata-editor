@@ -68,8 +68,8 @@ function createCompetitionsListDiv(parentId) {
 
     // Event listener for Enter key to add the competition
     inputleft.addEventListener('keydown', function(event) {
-        if (event.key === 'Enter' && inputleft.value.trim() !== '') {
-            createNewCompObj(parentId, inputleft.value.trim(), level+1, leftList);
+        if (event.key === 'Enter' && inputleft.value !== '') {
+            createNewCompObj(parentId, inputleft.value, level+1, leftList);
             inputleft.value = ''; // Clear input after adding
         }
     });
@@ -82,8 +82,8 @@ function createCompetitionsListDiv(parentId) {
 
             // Event listener for Enter key to add the competition
             inputright.addEventListener('keydown', function(event) {
-            if (event.key === 'Enter' && inputright.value.trim() !== '') {
-                createNewCompObj(parentId, inputright.value.trim(), 3, rightList);
+            if (event.key === 'Enter' && inputright.value !== '') {
+                createNewCompObj(parentId, inputright.value, 3, rightList);
                 inputright.value = ''; // Clear input after adding
             }
             });
@@ -98,8 +98,8 @@ function createCompetitionsListDiv(parentId) {
 
             // Event listener for Enter key to add the competition
             inputright.addEventListener('keydown', function(event) {
-                if (event.key === 'Enter' && inputright.value.trim() !== '') {
-                    createNewCompObj(parentId, inputright.value.trim(), 3, rightList);
+                if (event.key === 'Enter' && inputright.value !== '') {
+                    createNewCompObj(parentId, inputright.value, 3, rightList);
                     inputright.value = ''; // Clear input after adding
                 }
             });
@@ -246,7 +246,7 @@ function createCompetitionDivElement(child) {
     // Handle saving the edited name
     textNode.addEventListener('blur', function() {
         textNode.contentEditable = false;
-        divElement.dataset.name = textNode.textContent.trim();
+        divElement.dataset.name = textNode.textContent;
         updateCompObjName(divElement.dataset.compid, divElement.dataset.name);
     });
 
@@ -341,8 +341,8 @@ function commitChangesAndClose(shortNameInput, longNameInput, textNode, divEleme
         return;
     }
 
-    const newShortName = shortNameInput.value.trim();
-    const newLongName = longNameInput.value.trim();
+    const newShortName = shortNameInput.value;
+    const newLongName = longNameInput.value;
     textNode.textContent = newLongName;
 
     // Commit the changes

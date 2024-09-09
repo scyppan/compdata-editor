@@ -40,7 +40,9 @@ function createTaskSection(title, taskOptions, tasks) {
         descriptionSelect.addEventListener('change', () => {
             updateTaskData(task, 'description', descriptionSelect.value);
             updateParamLabels(descriptionSelect.value, param1Input, param2Input, param3Input, param4Input);
+            updateTaskDataForHiddenFields(task); // Reset hidden fields to zero
         });
+        
 
         // Event listener for param1 change
         param1Input.addEventListener('change', () => {
@@ -274,6 +276,30 @@ function createNewTaskData(id, type) {
     }
 
     data['tasks'].push(newTask);
+
+    data['tasks'].sort((a, b) => {
+        // Sort by 'id' first
+        if (a.id !== b.id) return a.id - b.id;
+    
+        // Sort 'when' with 'start' before 'end'
+        if (a.when !== b.when) {
+            if (a.when === 'start') return -1;
+            if (b.when === 'start') return 1;
+        }
+    
+        // Sort alphabetically by 'description'
+        if (a.description !== b.description) return a.description.localeCompare(b.description);
+    
+        // Sort by 'param1'
+        if (a.param1 !== b.param1) return a.param1 - b.param1;
+    
+        // Sort by 'param2'
+        if (a.param2 !== b.param2) return a.param2 - b.param2;
+    
+        // Continue with more params if needed
+        return 0; // If all fields are equal
+    });
+
     organizeCompetitions(data); // Assuming tasks are organized similarly
     createMessage('New task data created successfully', 'success');
     
@@ -388,5 +414,37 @@ function deleteTaskData(id, description, when, param1, param2, param3, param4) {
         }
     } else {
         console.error(`Task entry not found in relevant tasks for id ${id} with the specified criteria.`);
+    }
+}
+
+function refreshTaskSection(id, containerDiv, type) {
+    // Clear the existing section
+    while (containerDiv.firstChild) {
+        containerDiv.removeChild(containerDiv.firstChild);
+    }
+
+    // Fetch the updated task data
+    const tasksData = getDataForId('tasks', id);
+
+    // Define the start and end task descriptions
+    const startTasks = [
+        'FillWithTeam', 'FillFromCompTable', 'FillChampionsCupSeeded',
+        'FillFromSpecialTeamsWithNation', 'FillFromLeagueMaxFromCountry',
+        'FillFromLeagueMaxFromCountryShadowed', 'FillFromCompTablePosBackupSameLeague',
+        'FillFromCompTableBackupLeague', 'FillFromLeagueInOrder', 'FillFromLeague',
+        'ClearLeagueStats', 'FillFromCompTableBackup'
+    ];
+
+    const endTasks = [
+        'UpdateTable', 'UpdateMultiGroupLeagueStats', 'UpdateLeagueStats'
+    ];
+
+    // Based on the type ('start' or 'end'), recreate the appropriate task section
+    if (type === 'start') {
+        const startSection = createTaskSection('Start Tasks', startTasks, tasksData.filter(task => startTasks.includes(task.description)));
+        containerDiv.appendChild(startSection);
+    } else if (type === 'end') {
+        const endSection = createTaskSection('End Tasks', endTasks, tasksData.filter(task => endTasks.includes(task.description)));
+        containerDiv.appendChild(endSection);
     }
 }

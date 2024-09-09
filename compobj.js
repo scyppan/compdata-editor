@@ -21,6 +21,9 @@ function updateAllReferences(newLine, amt) {
 
     // Update weather
     updateWeatherReferences(newLine, amt);
+
+    //Update InitTeams
+    updateInitTeamsReferences(newLine, amt);
 }
 
 function updateTaskReferences(newLine, amt) {
@@ -97,6 +100,15 @@ function updateSettingsReferences(newLine, amt) {
 function updateStandingsReferences(newLine, amt) {
     data['standings'].forEach(entry => {
         // If the id references a line number greater than or equal to newLine, increment it
+        if (entry.id >= newLine) {
+            entry.id += amt;
+        }
+    });
+}
+
+function updateInitTeamsReferences(newLine, amt) {
+    data['initteams'].forEach(entry => {
+        // Update id references in the initteams dataset
         if (entry.id >= newLine) {
             entry.id += amt;
         }

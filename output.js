@@ -11,6 +11,7 @@ async function download() {
     zip.file('standings.txt', standingsToTxt(data['standings']));
     zip.file('tasks.txt', tasksToTxt(data['tasks']));
     zip.file('weather.txt', weatherToTxt(data['weather']));
+    zip.file('initteams.txt', initteamsToTxt(data['initteams']));
 
     // Generate JSON data blob
     const jsonDataBlob = await generateJsonDataBlob();
@@ -202,6 +203,25 @@ function weatherToTxt(weatherArray) {
     return weatherArray
         .filter(entry => !Object.values(entry).includes(null)) // Filter out rows with any null values
         .map(entry => `${entry.id},${entry.month},${entry.chancedry},${entry.chancerain},${entry.chancesnow},${entry.chanceovercast},${entry.unknown},${entry.sunset},${entry.nighttime}`)
+        .join('\n') + '\n';
+}
+
+function exportInitTeamsData() {
+    const dataStr = initTeamsToTxt(data['initteams']);
+    const blob = new Blob([dataStr], { type: 'text/plain;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'initteams_data.txt';
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function initteamsToTxt(initTeamsArray) {
+    return initTeamsArray
+        .filter(entry => !Object.values(entry).includes(null)) // Filter out rows with any null values
+        .map(entry => `${entry.id},${entry.finishpos},${entry.teamid}`)
         .join('\n') + '\n';
 }
 

@@ -114,7 +114,6 @@ function buildwindow2(id) {
     contentElement.innerHTML = ''; // Clear existing content
     contentElement.appendChild(mainHeader);
     contentElement.appendChild(parent);
-
     
     left.appendChild(competitionsListDiv);
     left.appendChild(settingsDiv);
@@ -141,8 +140,11 @@ function buildwindow3(id){
     contentElement.appendChild(mainHeader);
     contentElement.appendChild(parent);
 
+    const initTeamsDiv=createInitTeamsDiv(id);
+
     left.appendChild(competitionsDiv);
     left.appendChild(settingsDiv);
+    left.appendChild(initTeamsDiv);
     right.appendChild(tasksDiv);
 }
 
@@ -169,7 +171,7 @@ function buildwindow4(id){
     left.appendChild(competitionDiv);
     left.appendChild(settingsDiv);
     left.appendChild(scheduleDiv);
-    right.appendChild(advancementDiv);
+    //right.appendChild(advancementDiv);
     
 }
 
